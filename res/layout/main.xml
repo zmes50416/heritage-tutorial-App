@@ -3,19 +3,20 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
+
+<Button
+    android:id="@+id/retrieve_Location_Button"
+    android:text = "@string/retriveButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" 
+    />
+
 <com.google.android.maps.MapView
     android:id="@+id/mapview"
     android:layout_width="fill_parent"
     android:layout_height="428dp"
-    android:apiKey="0mP_T2GuPlWvJOcJu1ZfBZQF8Vu5a4BgRV_tOfw"
-    android:clickable="true" />
-
-<Button
-    android:id="@+id/retrieve_Location_Button"
-    android:text ="取得現在位置"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" 
-    />
+    android:apiKey="@string/googleMap_API"
+    android:clickable="true" >
+</com.google.android.maps.MapView>
 
  </LinearLayout>
