@@ -4,16 +4,19 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import java.util.List;
-import android.content.Context;
+
+import android.app.AlertDialog;
+import android.content.*;
 import android.graphics.drawable.Drawable;
 import com.google.android.maps.*;
 
-import edu.ncue.test.jls.*;
-
+import android.text.Editable;
 import android.view.View;
 import android.view.View.OnClickListener;
+//import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import android.location.LocationListener;
+import edu.ncue.test.jls.*;
 
 public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     /** Called when the activity is first created. */
@@ -22,14 +25,24 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	
 	protected LocationManager locator;	
 	protected Button gpsButton;
+	protected ImageButton searchButton;
+	protected ImageButton displayListButton;
 	protected MapView mv;
 	protected MapController mc;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);	//³]©wlayout
         
         gpsButton = (Button) findViewById(R.id.retrieve_Location_Button);	//create button&View
+        searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
+        displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
+        //InputMethodManager keyboard = ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE));
+        //keyboard
+        final EditText input = new EditText(this);
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        
         locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mv = (MapView) findViewById(R.id.mapview);
         mc = mv.getController();
@@ -49,9 +62,35 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 			}
         
         });
-        
+        searchButton.setOnClickListener(new OnClickListener(){
+        	public void onClick(View v){
+        		
+        		alert.setView(input);
+        		
+        		alert.setPositiveButton("Search", new DialogInterface.OnClickListener(){
+
+					public void onClick(DialogInterface dialog, int which) {
+						Editable value = input.getText();
+						//use value to search database
+					}
+        		});
+        		alert.setNegativeButton("Cancle",new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+        		alert.show();
+        		//keyboard.toggleSoftInput(softInputAnchor, 0)
+        	}
+        });
+        displayListButton.setOnClickListener(new OnClickListener(){
+        	public void onClick(View v){
+        		Intent intent = new Intent();
+        		intent.setClass(getApplicationContext(), BrowseContentActivity.class);
+        		startActivity(intent);
+        	}
+        });
         List<Overlay> mapOverlays = mv.getOverlays();
-        Drawable drawable = this.getResources().getDrawable(R.drawable.ic_launcher);
+        Drawable drawable = this.getResources().getDrawable(R.drawable.map_arrow);
         HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(drawable,this);
         GeoPoint point = new GeoPoint(30443769,-91158458);
         OverlayItem overlayitem = new OverlayItem(point, "Laisses Rouler!","I'm in Louisiana");

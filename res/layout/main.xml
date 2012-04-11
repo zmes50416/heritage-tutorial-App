@@ -3,14 +3,34 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
+    <LinearLayout
+        	android:orientation="horizontal"
+        	android:layout_width="fill_parent"
+        	android:layout_height="0dip"
+        	android:layout_weight="1">
+
+    			<ImageButton
+    			    android:id="@+id/pop_keyboard_Button"
+    			    android:layout_width="120dp"
+    			    android:layout_height="fill_parent"
+    			    android:src="@drawable/selector_find"
+    			    android:scaleType="fitCenter" />
 
-<Button
-    android:id="@+id/retrieve_Location_Button"
-    android:text = "@string/retriveButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" 
-    />
+    			<Button
+    			    android:id="@+id/retrieve_Location_Button"
+    			    android:layout_width="wrap_content"
+    			    android:layout_height="fill_parent"
+    			    android:text="@string/retriveButton" />
+    			<ImageButton
+    			    android:id="@+id/display_list_Button"
+    			    android:layout_width="wrap_content"
+    			    android:layout_height="wrap_content"
+    			    android:src="@drawable/selector_list"
+    			    android:scaleType = "fitCenter"
+    			    
+    			    />
 
+	</LinearLayout>
 <com.google.android.maps.MapView
     android:id="@+id/mapview"
     android:layout_width="fill_parent"

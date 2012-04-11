@@ -24,6 +24,8 @@
             </intent-filter>
         </activity>
         <uses-library android:name ="com.google.android.maps" />
+        <activity android:name="edu.ncue.im.BrowseContentActivity"></activity>
+        <activity android:name="edu.ncue.im.ContentDetailActivity"></activity>
     </application>
     
 
