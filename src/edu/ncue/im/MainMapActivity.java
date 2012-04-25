@@ -28,7 +28,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	protected ImageButton searchButton;
 	protected ImageButton displayListButton;
 	protected MapView mv;
-	protected MapController mc;
+	protected MapController mapController;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,14 +38,11 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         gpsButton = (Button) findViewById(R.id.retrieve_Location_Button);	//create button&View
         searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
         displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
-        //InputMethodManager keyboard = ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE));
-        //keyboard
-        final EditText input = new EditText(this);
-        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        
         
         locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mv = (MapView) findViewById(R.id.mapview);
-        mc = mv.getController();
+        mapController = mv.getController();
         mv.setBuiltInZoomControls(true);
         
         locator.requestLocationUpdates(
@@ -65,19 +62,23 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         searchButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
         		
+        		final EditText input = new EditText(v.getContext());
+                final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
         		alert.setView(input);
         		
         		alert.setPositiveButton("Search", new DialogInterface.OnClickListener(){
 
 					public void onClick(DialogInterface dialog, int which) {
-						Editable value = input.getText();
 						//use value to search database
+						//Editable value = input.getText();
 					}
         		});
         		alert.setNegativeButton("Cancle",new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
+						
 					}
 				});
+        		
         		alert.show();
         		//keyboard.toggleSoftInput(softInputAnchor, 0)
         	}
@@ -89,19 +90,19 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         		startActivity(intent);
         	}
         });
-        List<Overlay> mapOverlays = mv.getOverlays();
-        Drawable drawable = this.getResources().getDrawable(R.drawable.map_arrow);
-        HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(drawable,this);
-        GeoPoint point = new GeoPoint(30443769,-91158458);
-        OverlayItem overlayitem = new OverlayItem(point, "Laisses Rouler!","I'm in Louisiana");
+        //List<Overlay> mapOverlays = mv.getOverlays();
+        //Drawable drawable = this.getResources().getDrawable(R.drawable.map_arrow);
+        //HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(drawable,this);
+        //GeoPoint point = new GeoPoint(30443769,-91158458);
+        //OverlayItem overlayitem = new OverlayItem(point, "Laisses Rouler!","I'm in Louisiana");
         
-        GeoPoint p2 = new GeoPoint(17385812, 78480667);
-        OverlayItem overlayitem2 = new OverlayItem(p2, "Namashkaar!","Im in Hyderabad");
+        //GeoPoint p2 = new GeoPoint(17385812, 78480667);
+        //OverlayItem overlayitem2 = new OverlayItem(p2, "Namashkaar!","Im in Hyderabad");
         
-        itemizedOverlay.addOverlay(overlayitem);
-        itemizedOverlay.addOverlay(overlayitem2);
+        //itemizedOverlay.addOverlay(overlayitem);
+        //itemizedOverlay.addOverlay(overlayitem2);
         
-        mapOverlays.add(itemizedOverlay);
+        //mapOverlays.add(itemizedOverlay);
     }
     
     @Override
@@ -115,12 +116,21 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	
     	if (location != null)
     	{
+    		
     		String message = String.format("CurrentLocation \n Longitude: %1$s \n Latitude: %2$s ", location.getLongitude(),location.getLatitude());
     		Toast.makeText(MainMapActivity.this, message, Toast.LENGTH_LONG).show();
+    		
     		//retrieve where device is and zoom to that position
-    		GeoPoint cp = new GeoPoint((int)(location.getLatitude()*1E6),(int)(location.getLongitude()*1E6));
-    		mc.animateTo(cp);
-    		mc.setZoom(16);
+    		GeoPoint currentPoint = new GeoPoint((int)(location.getLatitude()*1E6),(int)(location.getLongitude()*1E6));
+    		mapController.animateTo(currentPoint);
+    		mapController.setZoom(16);
+    		if(!mv.getOverlays().isEmpty())
+    			mv.getOverlays().clear();
+    		OverlayItem overlayItem = new OverlayItem(currentPoint, "Current Position","");
+    		HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
+    		itemizedOverlay.addOverlay(overlayItem);
+    		mv.getOverlays().add(itemizedOverlay);
+    		
     		mv.invalidate();
     	}
     	else
