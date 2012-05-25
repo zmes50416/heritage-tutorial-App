@@ -3,7 +3,10 @@ package edu.ncue.im;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.*;
@@ -11,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import com.google.android.maps.*;
 
 import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 //import android.view.inputmethod.InputMethodManager;
@@ -29,6 +33,9 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	protected ImageButton displayListButton;
 	protected MapView mv;
 	protected MapController mapController;
+	protected static MyLocationListener myLocationListener;
+	
+	protected DEHAPIReceiver receiver;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,12 +51,12 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         mv = (MapView) findViewById(R.id.mapview);
         mapController = mv.getController();
         mv.setBuiltInZoomControls(true);
-        
+        myLocationListener = new MyLocationListener();
         locator.requestLocationUpdates(
         		LocationManager.GPS_PROVIDER, 
         		MINIMUM_DISTANCE_CHANGE_FOR_UPDATE,
         		MINIMUM_TIME_BETWEEN_UPDATE, 
-        		new MyLocationListener());
+        		myLocationListener);
         
         gpsButton.setOnClickListener(new OnClickListener(){
 
@@ -61,7 +68,6 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         });
         searchButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
-        		
         		final EditText input = new EditText(v.getContext());
                 final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
         		alert.setView(input);
@@ -70,7 +76,22 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 
 					public void onClick(DialogInterface dialog, int which) {
 						//use value to search database
-						//Editable value = input.getText();
+						Boolean findFlag = false;
+						Editable value = input.getText();
+						//Toast.makeText(getApplicationContext(), "Search Start", Toast.LENGTH_SHORT).show();
+						for(String name:BrowseContentActivity.COUNTRIES){
+							if(name.contains(input.getText())){
+								findFlag = true;
+								Intent intent = new Intent();
+								intent.setClass(getApplicationContext(), ContentDetailActivity.class);
+								startActivity(intent);
+								
+								break;
+							}
+							
+						}
+						if(findFlag == false)
+							Toast.makeText(getApplicationContext(), "Cant Find Any Point contains "+input.getText(), Toast.LENGTH_SHORT).show();
 					}
         		});
         		alert.setNegativeButton("Cancle",new DialogInterface.OnClickListener() {
@@ -88,23 +109,31 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         		Intent intent = new Intent();
         		intent.setClass(getApplicationContext(), BrowseContentActivity.class);
         		startActivity(intent);
+        		
         	}
         });
-        //List<Overlay> mapOverlays = mv.getOverlays();
-        //Drawable drawable = this.getResources().getDrawable(R.drawable.map_arrow);
-        //HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(drawable,this);
-        //GeoPoint point = new GeoPoint(30443769,-91158458);
-        //OverlayItem overlayitem = new OverlayItem(point, "Laisses Rouler!","I'm in Louisiana");
         
-        //GeoPoint p2 = new GeoPoint(17385812, 78480667);
-        //OverlayItem overlayitem2 = new OverlayItem(p2, "Namashkaar!","Im in Hyderabad");
-        
-        //itemizedOverlay.addOverlay(overlayitem);
-        //itemizedOverlay.addOverlay(overlayitem2);
-        
-        //mapOverlays.add(itemizedOverlay);
+        locator.removeUpdates(myLocationListener);
     }
     
+    @Override
+    protected void onPause(){
+    	super.onPause();
+    	Log.d("gps", "paused");
+    	locator.removeUpdates(myLocationListener);
+    }
+    @Override
+    protected void onResume(){
+    	super.onResume();
+    	Log.d("gps", "Resumed");
+    	//myLocationListener = new MyLocationListener();
+    	locator.requestLocationUpdates(
+        		LocationManager.GPS_PROVIDER, 
+        		MINIMUM_DISTANCE_CHANGE_FOR_UPDATE,
+        		MINIMUM_TIME_BETWEEN_UPDATE, 
+        		myLocationListener);
+        		
+    }
     @Override
     protected boolean isRouteDisplayed()
     {
@@ -124,14 +153,36 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		GeoPoint currentPoint = new GeoPoint((int)(location.getLatitude()*1E6),(int)(location.getLongitude()*1E6));
     		mapController.animateTo(currentPoint);
     		mapController.setZoom(16);
-    		if(!mv.getOverlays().isEmpty())
+    		if(!mv.getOverlays().isEmpty())//clear the old place first
     			mv.getOverlays().clear();
     		OverlayItem overlayItem = new OverlayItem(currentPoint, "Current Position","");
     		HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
     		itemizedOverlay.addOverlay(overlayItem);
     		mv.getOverlays().add(itemizedOverlay);
     		
+    		
+    		
+    		//receiver test
+    		
+    		receiver = new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),0.5f);
+    		if(!receiver.soilist.isEmpty()){
+    			Toast.makeText(getApplication(),"soilist isnot empty",Toast.LENGTH_LONG).show();
+    			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
+    			for(Map<String, String> map : receiver.soilist){
+    				GeoPoint gp;
+    				gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
+    				OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
+    				poiOverlay.addOverlay(poi);
+    			}
+    			mv.getOverlays().add(poiOverlay);
+    		}else{
+    			Toast.makeText(getApplication(),"Can't Find Any POI in distance",Toast.LENGTH_LONG).show();
+    		}
+    		
+    		//receiver test
+    		
     		mv.invalidate();
+    		
     	}
     	else
     	{

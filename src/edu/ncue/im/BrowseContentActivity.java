@@ -9,6 +9,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.view.*;
 import edu.ncue.test.jls.*;
 
+import android.widget.SimpleAdapter;
 public class BrowseContentActivity extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -30,6 +31,6 @@ public class BrowseContentActivity extends ListActivity {
 		
 	}
 	static final String[] COUNTRIES = new String[]{
-		"testA","testB","testC","testD","testE","testF","testG"
+		"SampleA","SampleB","SampleC","SampleD","SampleE","SampleF","SampleG"
 	  };
 }
