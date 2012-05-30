@@ -1,6 +1,9 @@
 package edu.ncue.im;
 
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.content.*;
@@ -11,11 +14,26 @@ import edu.ncue.test.jls.*;
 
 import android.widget.SimpleAdapter;
 public class BrowseContentActivity extends ListActivity {
+	
+	protected String[] POI_NAME;
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.contentlist_item,COUNTRIES));
+		
+		ArrayList<Map<String, String>> dataList = (ArrayList<Map<String, String>>) this.getIntent().getSerializableExtra("POI");
+		if(dataList != null){
+			int i =0;
+			POI_NAME = new String[dataList.size()];
+			for(Map<String, String> map:dataList){
+				POI_NAME[i] = map.get("POI_title");
+				i++;
+			}
+		}else
+			POI_NAME = new String[]{"NONE"};
+		
+		
+		setListAdapter(new ArrayAdapter<String>(this, R.layout.contentlist_item,POI_NAME));
 		ListView lv = getListView();
 		
 		lv.setOnItemClickListener(new OnItemClickListener(){
@@ -27,10 +45,5 @@ public class BrowseContentActivity extends ListActivity {
 			}
 		});
 		
-		
-		
 	}
-	static final String[] COUNTRIES = new String[]{
-		"SampleA","SampleB","SampleC","SampleD","SampleE","SampleF","SampleG"
-	  };
 }

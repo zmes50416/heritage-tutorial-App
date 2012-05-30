@@ -26,6 +26,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     /** Called when the activity is first created. */
 	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATE = 1;	//meter
 	private static final long MINIMUM_TIME_BETWEEN_UPDATE = 1000; 	//milesecond
+	private static final float DISTANCE_TO_SEARCH = 0.5f;
 	
 	protected LocationManager locator;	
 	protected Button gpsButton;
@@ -52,12 +53,12 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         mapController = mv.getController();
         mv.setBuiltInZoomControls(true);
         myLocationListener = new MyLocationListener();
-        locator.requestLocationUpdates(
+        /*locator.requestLocationUpdates(
         		LocationManager.GPS_PROVIDER, 
         		MINIMUM_DISTANCE_CHANGE_FOR_UPDATE,
         		MINIMUM_TIME_BETWEEN_UPDATE, 
         		myLocationListener);
-        
+        */
         gpsButton.setOnClickListener(new OnClickListener(){
 
 			public void onClick(View v) {
@@ -79,7 +80,8 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 						Boolean findFlag = false;
 						Editable value = input.getText();
 						//Toast.makeText(getApplicationContext(), "Search Start", Toast.LENGTH_SHORT).show();
-						for(String name:BrowseContentActivity.COUNTRIES){
+					/*
+						for(String name:BrowseContentActivity.POI_NAME){
 							if(name.contains(input.getText())){
 								findFlag = true;
 								Intent intent = new Intent();
@@ -92,6 +94,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 						}
 						if(findFlag == false)
 							Toast.makeText(getApplicationContext(), "Cant Find Any Point contains "+input.getText(), Toast.LENGTH_SHORT).show();
+					*/
 					}
         		});
         		alert.setNegativeButton("Cancle",new DialogInterface.OnClickListener() {
@@ -107,13 +110,21 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         displayListButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
         		Intent intent = new Intent();
+        		Bundle bundle = new Bundle();
+        		Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        		if(location != null){//passing currentGeoData to ListView
+        			bundle.putSerializable("POI", new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH).soilist);
+        			intent.putExtras(bundle);
+        			//bundle.putDouble("CurrentLongitude", location.getLongitude());
+        			//bundle.putDouble("CurrentLatitude", location.getLatitude());
+        		}
         		intent.setClass(getApplicationContext(), BrowseContentActivity.class);
         		startActivity(intent);
         		
         	}
         });
         
-        locator.removeUpdates(myLocationListener);
+        
     }
     
     @Override
@@ -164,9 +175,9 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		
     		//receiver test
     		
-    		receiver = new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),0.5f);
+    		receiver = new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH);
     		if(!receiver.soilist.isEmpty()){
-    			Toast.makeText(getApplication(),"soilist isnot empty",Toast.LENGTH_LONG).show();
+    			//Toast.makeText(getApplication(),"soilist isnot empty",Toast.LENGTH_LONG).show();
     			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
     			for(Map<String, String> map : receiver.soilist){
     				GeoPoint gp;
