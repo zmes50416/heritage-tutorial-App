@@ -5,19 +5,16 @@ import android.location.LocationManager;
 import android.os.Bundle;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.*;
-import android.graphics.drawable.Drawable;
 import com.google.android.maps.*;
 
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-//import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import android.location.LocationListener;
 import edu.ncue.test.jls.*;
@@ -77,8 +74,8 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 
 					public void onClick(DialogInterface dialog, int which) {
 						//use value to search database
-						Boolean findFlag = false;
-						Editable value = input.getText();
+						//Boolean findFlag = false;
+						//Editable value = input.getText();
 						//Toast.makeText(getApplicationContext(), "Search Start", Toast.LENGTH_SHORT).show();
 					/*
 						for(String name:BrowseContentActivity.POI_NAME){
@@ -113,7 +110,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         		Bundle bundle = new Bundle();
         		Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         		if(location != null){//passing currentGeoData to ListView
-        			bundle.putSerializable("POI", new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH).soilist);
+        			bundle.putSerializable("POI", new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH).getsoilist());
         			intent.putExtras(bundle);
         			//bundle.putDouble("CurrentLongitude", location.getLongitude());
         			//bundle.putDouble("CurrentLatitude", location.getLatitude());
@@ -176,10 +173,10 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		//receiver test
     		
     		receiver = new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH);
-    		if(!receiver.soilist.isEmpty()){
-    			//Toast.makeText(getApplication(),"soilist isnot empty",Toast.LENGTH_LONG).show();
+    		ArrayList<Map<String,String>> soilist = receiver.getsoilist();
+    		if(!soilist.isEmpty()){
     			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
-    			for(Map<String, String> map : receiver.soilist){
+    			for(Map<String, String> map : soilist){
     				GeoPoint gp;
     				gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
     				OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));

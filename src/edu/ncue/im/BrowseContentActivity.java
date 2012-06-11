@@ -12,7 +12,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.view.*;
 import edu.ncue.test.jls.*;
 
-import android.widget.SimpleAdapter;
 public class BrowseContentActivity extends ListActivity {
 	
 	protected String[] POI_NAME;

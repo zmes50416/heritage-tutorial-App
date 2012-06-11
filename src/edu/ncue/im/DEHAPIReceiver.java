@@ -26,10 +26,10 @@ import android.util.Log;
 public class DEHAPIReceiver {
 	String formatted_result;
 	String request_URL;
-	ArrayList<Map<String, String>> soilist;
+	private ArrayList<Map<String, String>> soilist;
 	
-	JSONObject jsonObjcet;
-	JSONArray jsonList;
+	protected JSONObject jsonObjcet;
+	protected JSONArray jsonList;
 	public DEHAPIReceiver(Double lat,Double lng,float dist){
 		request_URL ="http://deh.csie.ncku.edu.tw/dehencode/json/nearbyPOIs?lat="+lat+"&lng="+lng+"&dist="+dist;
 		soilist = new ArrayList<Map<String,String>>();
@@ -69,11 +69,11 @@ public class DEHAPIReceiver {
 					}
 					return list;
 				}
-	private String purge(String str){
+	/*private String purge(String str){
 	    str.replace("\t", "");
 	    str.replace("\n", "");
 	    return str;
-	    }
+	    }*/
 			
 	private String sentHttpRequest(String url) throws Exception{
 		BufferedReader in = null;
@@ -99,5 +99,9 @@ public class DEHAPIReceiver {
 			e.getMessage();
 			return null;
 		}
+	}
+	
+	public ArrayList<Map<String, String>> getsoilist(){
+		return soilist;
 	}
 }
