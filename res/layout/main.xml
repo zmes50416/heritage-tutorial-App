@@ -78,7 +78,8 @@
         android:id="@id/POIcontent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF"
+        android:background="@color/White"
+        android:textColor="@color/Black"
         android:text = "Content" />
 
 </SlidingDrawer>

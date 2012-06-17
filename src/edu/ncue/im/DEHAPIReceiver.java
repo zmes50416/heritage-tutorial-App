@@ -23,7 +23,9 @@ import android.util.Log;
  * 傳出Request 並取得JSON回應
  * 最後處理成一份ArrayList
  */
+
 public class DEHAPIReceiver {
+	final static String POI_ID = "id", POI_TiTle = "title", POI_DISTANCE = "distance", POI_LATITUDE ="latitude", POI_LONGTITUE = "longitude", POI_DESCRIPTION = "description";
 	String formatted_result;
 	String request_URL;
 	private ArrayList<Map<String, String>> soilist;
@@ -40,7 +42,6 @@ public class DEHAPIReceiver {
 			e.printStackTrace();
 		}
 		
-			//simpleAdapter adapter = new SimpleAdapter(this, soilist, ,new String[]{"POI_id","POI_title","distance"}, new int[]{)
 	}
 			
 	private ArrayList<Map<String, String>> parseJson(String str)throws JSONException{

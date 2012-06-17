@@ -24,7 +24,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     /** Called when the activity is first created. */
 	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATE = 1;	//meter
 	private static final long MINIMUM_TIME_BETWEEN_UPDATE = 1000; 	//milesecond
-	private static final float DISTANCE_TO_SEARCH = 0.5f;
+	static float DISTANCE_TO_SEARCH = 0.5f;
 	
 	final static String POI_TAPPED_ACTION = "MainMapActivity.POI_TAPPED_ACTION";
 	
@@ -54,16 +54,10 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         mapController = mv.getController();
         mv.setBuiltInZoomControls(true);
         myLocationListener = new MyLocationListener();
-        /*locator.requestLocationUpdates(
-        		LocationManager.GPS_PROVIDER, 
-        		MINIMUM_DISTANCE_CHANGE_FOR_UPDATE,
-        		MINIMUM_TIME_BETWEEN_UPDATE, 
-        		myLocationListener);
-        */
+        
         gpsButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v) {
 	        		showCurrentLocation();
-	        		//Toast.makeText(MainMapActivity.this, "CLICKED", Toast.LENGTH_SHORT).show();
 			}
         });
         searchButton.setOnClickListener(new OnClickListener(){
@@ -76,24 +70,33 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 
 					public void onClick(DialogInterface dialog, int which) {
 						//use value to search database
-						//Boolean findFlag = false;
-						//Editable value = input.getText();
-						//Toast.makeText(getApplicationContext(), "Search Start", Toast.LENGTH_SHORT).show();
-					/*
-						for(String name:BrowseContentActivity.POI_NAME){
-							if(name.contains(input.getText())){
-								findFlag = true;
-								Intent intent = new Intent();
-								intent.setClass(getApplicationContext(), ContentDetailActivity.class);
-								startActivity(intent);
-								
-								break;
+						Boolean findFlag = false;
+						Editable value = input.getText();
+						Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+						if(location != null){
+							ArrayList<Map<String, String>> foundList = new ArrayList<Map<String, String>>();
+							for(Map<String, String> m:new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH).getsoilist()){
+								String name = m.get("POI_title");
+								if(name.contains(input.getText())){
+									foundList.add(m);
+									findFlag = true;
+								}		
 							}
-							
+							if(findFlag == true){
+								Intent intent = new Intent();
+								Bundle searchBundle = new Bundle();
+								searchBundle.putSerializable("POI", foundList);
+								intent.putExtras(searchBundle);
+								intent.setClass(getApplicationContext(), BrowseContentActivity.class);
+								startActivity(intent);
+							}
+							if(findFlag == false){
+								Toast.makeText(getApplicationContext(), "Cant Find Any Point contains "+input.getText(), Toast.LENGTH_SHORT).show();
+							}
 						}
-						if(findFlag == false)
-							Toast.makeText(getApplicationContext(), "Cant Find Any Point contains "+input.getText(), Toast.LENGTH_SHORT).show();
-					*/
+							
+						
+						
 					}
         		});
         		alert.setNegativeButton("Cancle",new DialogInterface.OnClickListener() {
@@ -113,6 +116,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         		if(location != null){//passing currentGeoData to ListView
         			
             		Bundle bundle = new Bundle();
+            		
         			bundle.putSerializable("POI", new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH).getsoilist());
         			intent.putExtras(bundle);
         			//bundle.putDouble("CurrentLongitude", location.getLongitude());
@@ -192,8 +196,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		
     		//receiver test
     		
-    		receiver = new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH);
-    		ArrayList<Map<String,String>> soilist = receiver.getsoilist();
+    		ArrayList<Map<String,String>> soilist = this.getData(location.getLatitude(), location.getLongitude(), DISTANCE_TO_SEARCH);
     		if(!soilist.isEmpty()){
     			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
     			for(Map<String, String> map : soilist){
@@ -216,8 +219,15 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	{
     		Toast.makeText(getApplication(), "Currently cant get the Device's Location.",Toast.LENGTH_LONG).show();
     	}
+    	
     }
-
+    public ArrayList<Map<String, String>> getData(double latitude, double longtitude,float distance){
+    	receiver = new DEHAPIReceiver(latitude,longtitude,distance);
+		ArrayList<Map<String,String>> soilist = receiver.getsoilist();
+		return soilist;
+    	
+    }
+    
     //inner Class
     private class MyLocationListener implements LocationListener{
 

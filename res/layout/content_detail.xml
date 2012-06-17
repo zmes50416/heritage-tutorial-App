@@ -26,8 +26,10 @@
             android:textSize="20dip" />
         </LinearLayout>
         <ScrollView 
+            android:id="@+id/contentScrollView"
             android:layout_height="fill_parent"
             android:layout_width="fill_parent"
-            />
+            >
+        </ScrollView>
     
 </LinearLayout>

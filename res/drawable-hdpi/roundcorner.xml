@@ -15,6 +15,6 @@
 	<!-- android:radius 弧形的半徑 -->
 	
 	<corners 
-	    android:topLeftRadius="4dip" 
-	    android:topRightRadius = "4dip" />
+	    android:topLeftRadius="6dip" 
+	    android:topRightRadius = "6dip" />
 </shape> 
