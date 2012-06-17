@@ -44,26 +44,42 @@
 </com.google.android.maps.MapView>
 
 <SlidingDrawer
-	android:id="@+id/slidingDrawer"
+	android:id="@+id/poiDrawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:topOffset="50dip" 
     android:handle = "@+id/handler"
     android:content = "@+id/POIcontent"
+    
     android:layout_alignParentBottom="true"
 	>
-    <TextView
-        android:id ="@id/handler"
-        android:text = "test"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-    />
-
+    			
+    <TableLayout 
+		android:id ="@id/handler"
+		android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        
+    	<!--  <ImageButton
+    			    android:layout_width="120dp"
+    			    android:layout_height="fill_parent"
+    			    android:src="@drawable/selector_find"
+    			    android:scaleType="fitCenter" />
+    	-->
+    	<TextView
+    	    android:id = "@+id/drawerTitle"
+        	android:text = "POI標題"
+        	android:gravity= "center"
+        	android:background = "@drawable/roundcorner"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+    	/>
+    	
+	</TableLayout>
     <TextView
         android:id="@id/POIcontent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text = "test2" />
+        android:background="#FFFFFF"
+        android:text = "Content" />
 
 </SlidingDrawer>
 

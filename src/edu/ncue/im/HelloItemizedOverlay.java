@@ -1,12 +1,16 @@
 package edu.ncue.im;
 
 import java.util.ArrayList;
-import android.app.AlertDialog;
+
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+
 import com.google.android.maps.*;
 public class HelloItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 
+	
 	private ArrayList<OverlayItem> mOverlay = new ArrayList<OverlayItem>();
 	private Context mContext;
 	
@@ -35,11 +39,13 @@ public class HelloItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 	protected boolean onTap(int index)
 	{
 		OverlayItem item = mOverlay.get(index);
-		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("POITitle", item.getTitle());
+		bundle.putSerializable("POISnippet", item.getSnippet());
+		Intent intent = new Intent();
+		intent.setAction(MainMapActivity.POI_TAPPED_ACTION);
+		mContext.sendBroadcast(intent.putExtras(bundle));
 		
-		dialog.setTitle(item.getTitle());
-		dialog.setMessage(item.getSnippet());
-		dialog.show();
 		return true;
 	}
 

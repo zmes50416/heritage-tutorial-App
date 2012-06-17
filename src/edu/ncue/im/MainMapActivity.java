@@ -9,6 +9,7 @@ import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.*;
+
 import com.google.android.maps.*;
 
 import android.text.Editable;
@@ -25,6 +26,8 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	private static final long MINIMUM_TIME_BETWEEN_UPDATE = 1000; 	//milesecond
 	private static final float DISTANCE_TO_SEARCH = 0.5f;
 	
+	final static String POI_TAPPED_ACTION = "MainMapActivity.POI_TAPPED_ACTION";
+	
 	protected LocationManager locator;	
 	protected Button gpsButton;
 	protected ImageButton searchButton;
@@ -33,6 +36,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	protected MapController mapController;
 	protected static MyLocationListener myLocationListener;
 	
+	protected SlidingDrawer poiDrawer;
 	protected DEHAPIReceiver receiver;
 	
     @Override
@@ -43,7 +47,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         gpsButton = (Button) findViewById(R.id.retrieve_Location_Button);	//create button&View
         searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
         displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
-        
+        poiDrawer = (SlidingDrawer)findViewById(R.id.poiDrawer);
         
         locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mv = (MapView) findViewById(R.id.mapview);
@@ -57,12 +61,10 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         		myLocationListener);
         */
         gpsButton.setOnClickListener(new OnClickListener(){
-
-			public void onClick(View v) {
+        	public void onClick(View v) {
 	        		showCurrentLocation();
 	        		//Toast.makeText(MainMapActivity.this, "CLICKED", Toast.LENGTH_SHORT).show();
 			}
-        
         });
         searchButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
@@ -107,9 +109,10 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         displayListButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
         		Intent intent = new Intent();
-        		Bundle bundle = new Bundle();
         		Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         		if(location != null){//passing currentGeoData to ListView
+        			
+            		Bundle bundle = new Bundle();
         			bundle.putSerializable("POI", new DEHAPIReceiver(location.getLatitude(),location.getLongitude(),DISTANCE_TO_SEARCH).getsoilist());
         			intent.putExtras(bundle);
         			//bundle.putDouble("CurrentLongitude", location.getLongitude());
@@ -134,7 +137,6 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     protected void onResume(){
     	super.onResume();
     	Log.d("gps", "Resumed");
-    	//myLocationListener = new MyLocationListener();
     	locator.requestLocationUpdates(
         		LocationManager.GPS_PROVIDER, 
         		MINIMUM_DISTANCE_CHANGE_FOR_UPDATE,
@@ -164,6 +166,24 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		if(!mv.getOverlays().isEmpty())//clear the old place first
     			mv.getOverlays().clear();
     		OverlayItem overlayItem = new OverlayItem(currentPoint, "Current Position","");
+    		
+    		IntentFilter intentFilter = new IntentFilter();
+    		intentFilter.addAction(POI_TAPPED_ACTION);
+    		this.registerReceiver(new BroadcastReceiver(){
+				@Override
+				public void onReceive(Context arg0, Intent arg1) {
+					String title = (String) arg1.getSerializableExtra("POITitle");
+					String snippets = (String) arg1.getSerializableExtra("POISnippet");
+					TextView drawerTitle = (TextView)poiDrawer.findViewById(R.id.drawerTitle);
+					TextView poiContent = (TextView) poiDrawer.findViewById(R.id.POIcontent);
+					drawerTitle.setText(title);
+					poiContent.setText(snippets);
+					Log.d("BroadCast", title);
+					Log.d("BroadCast", snippets);
+				}
+    			
+    		}, intentFilter);
+    		
     		HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
     		itemizedOverlay.addOverlay(overlayItem);
     		mv.getOverlays().add(itemizedOverlay);
