@@ -24,7 +24,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     /** Called when the activity is first created. */
 	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATE = 1;	//meter
 	private static final long MINIMUM_TIME_BETWEEN_UPDATE = 1000; 	//milesecond
-	static float DISTANCE_TO_SEARCH = 0.5f;
+	private static float DISTANCE_TO_SEARCH = 2f;
 	
 	final static String POI_TAPPED_ACTION = "MainMapActivity.POI_TAPPED_ACTION";
 	
@@ -48,11 +48,12 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
         displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
         poiDrawer = (SlidingDrawer)findViewById(R.id.poiDrawer);
-        
+        poiDrawer.setVisibility(View.INVISIBLE);
         locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mv = (MapView) findViewById(R.id.mapview);
+        mv.setBuiltInZoomControls(false);
         mapController = mv.getController();
-        mv.setBuiltInZoomControls(true);
+        //mv.setBuiltInZoomControls(true);
         myLocationListener = new MyLocationListener();
         
         gpsButton.setOnClickListener(new OnClickListener(){
@@ -178,6 +179,9 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 				public void onReceive(Context arg0, Intent arg1) {
 					String title = (String) arg1.getSerializableExtra("POITitle");
 					String snippets = (String) arg1.getSerializableExtra("POISnippet");
+					if(poiDrawer.getVisibility()==View.INVISIBLE){
+						poiDrawer.setVisibility(View.VISIBLE);
+					}
 					TextView drawerTitle = (TextView)poiDrawer.findViewById(R.id.drawerTitle);
 					TextView poiContent = (TextView) poiDrawer.findViewById(R.id.POIcontent);
 					drawerTitle.setText(title);
@@ -198,7 +202,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		
     		ArrayList<Map<String,String>> soilist = this.getData(location.getLatitude(), location.getLongitude(), DISTANCE_TO_SEARCH);
     		if(!soilist.isEmpty()){
-    			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
+    			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.poi), this);
     			for(Map<String, String> map : soilist){
     				GeoPoint gp;
     				gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));

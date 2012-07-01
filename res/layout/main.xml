@@ -46,15 +46,15 @@
 <SlidingDrawer
 	android:id="@+id/poiDrawer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:handle = "@+id/handler"
-    android:content = "@+id/POIcontent"
+    android:layout_height="80dp"
+    android:handle = "@+id/poiDrawerHandler"
+    android:content = "@+id/poiDrawerContent"
     
     android:layout_alignParentBottom="true"
 	>
     			
     <TableLayout 
-		android:id ="@id/handler"
+		android:id ="@id/poiDrawerHandler"
 		android:layout_width="fill_parent"
         android:layout_height="wrap_content">
         
@@ -66,22 +66,27 @@
     	-->
     	<TextView
     	    android:id = "@+id/drawerTitle"
-        	android:text = "POI標題"
+        	android:text = ""
         	android:gravity= "center"
         	android:background = "@drawable/roundcorner"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
     	/>
     	
-	</TableLayout>
+	</TableLayout>	<ScrollView
+	    android:id="@id/poiDrawerContent"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:fadingEdge="none">
     <TextView
-        android:id="@id/POIcontent"
+        android:id="@+id/POIcontent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/White"
         android:textColor="@color/Black"
-        android:text = "Content" />
+        android:text = "" />
 
+	</ScrollView>
 </SlidingDrawer>
 
 </RelativeLayout>
