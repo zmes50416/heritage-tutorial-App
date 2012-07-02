@@ -2,11 +2,14 @@ package edu.ncue.im;
 
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.*;
 
@@ -43,6 +46,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);	//³]©wlayout
+        
         
         gpsButton = (Button) findViewById(R.id.retrieve_Location_Button);	//create button&View
         searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
@@ -155,7 +159,8 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	return false;
     }
     
-    protected void showCurrentLocation(){
+	
+	protected void showCurrentLocation(){
     	Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     	
     	if (location != null)
@@ -200,7 +205,13 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		
     		//receiver test
     		
-    		ArrayList<Map<String,String>> soilist = this.getData(location.getLatitude(), location.getLongitude(), DISTANCE_TO_SEARCH);
+    		ArrayList<Map<String, String>> soilist = null;
+			try {
+				soilist = new POILoadTask().execute(location.getLatitude(),location.getLongitude()).get();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
     		if(!soilist.isEmpty()){
     			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.poi), this);
     			for(Map<String, String> map : soilist){
@@ -258,3 +269,16 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	
     }
 }
+	class POILoadTask extends AsyncTask<Double, Void, ArrayList<Map<String, String>>>{
+		DEHAPIReceiver receiver;
+		
+		@Override
+		protected ArrayList<Map<String, String>> doInBackground(Double... params) {
+			// TODO Auto-generated method stub
+			receiver = new DEHAPIReceiver(params[0],params[1],0.5f);
+			return receiver.getsoilist();
+		}
+		
+
+		
+	}

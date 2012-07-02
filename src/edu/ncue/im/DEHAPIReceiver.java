@@ -24,7 +24,7 @@ import android.util.Log;
  * 最後處理成一份ArrayList
  */
 
-public class DEHAPIReceiver {
+public class DEHAPIReceiver{
 	final static String POI_ID = "id", POI_TiTle = "title", POI_DISTANCE = "distance", POI_LATITUDE ="latitude", POI_LONGTITUE = "longitude", POI_DESCRIPTION = "description";
 	String formatted_result;
 	String request_URL;
@@ -60,14 +60,17 @@ public class DEHAPIReceiver {
 						map.put("latitude", temp.getString("latitude"));
 						map.put("longitude", temp.getString("longitude"));
 						map.put("POI_description",temp.getString("POI_description"));
-						
+						//map.put("PICs", temp.getString("PICs"));
 						list.add(map);
 						Log.d("mine",temp.getString("POI_title") );
 				        Log.d("mine",temp.getString("POI_id") );
 				        Log.d("mine",temp.getString("distance") );
+				        //Log.d("mine",temp.getString("PICs"));
 					}
 						
 					}
+				else
+					Log.d("mine","Null List");
 					return list;
 				}
 	/*private String purge(String str){
@@ -82,6 +85,7 @@ public class DEHAPIReceiver {
 			HttpClient client = new DefaultHttpClient();
 			HttpGet request = new HttpGet(url);
 			Log.d("mine", url);
+			//problem found, need Async class to solve this.
 			HttpResponse response = client.execute(request);
 			
 			in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
@@ -97,7 +101,9 @@ public class DEHAPIReceiver {
 			String result = sb.toString();
 			return result;
 		}catch(Exception e){
+			
 			e.getMessage();
+			e.printStackTrace();
 			return null;
 		}
 	}
