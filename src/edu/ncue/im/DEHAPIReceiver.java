@@ -50,8 +50,11 @@ public class DEHAPIReceiver{
 					//formatted_result = purge(formatted_result);
 					jsonObjcet = new JSONObject(str);
 					JSONArray soilist = jsonObjcet.getJSONArray("results");
+					
+					
 					for(int i=0;i<soilist.length();i++){
 						JSONObject temp = soilist.getJSONObject(i);
+						
 						//add hashmap to ArrayList
 						HashMap<String, String> map = new HashMap<String, String>();
 						map.put("POI_id", temp.getString("POI_id"));
@@ -60,12 +63,25 @@ public class DEHAPIReceiver{
 						map.put("latitude", temp.getString("latitude"));
 						map.put("longitude", temp.getString("longitude"));
 						map.put("POI_description",temp.getString("POI_description"));
-						//map.put("PICs", temp.getString("PICs"));
+						JSONObject picJson = temp.getJSONObject("PICs");
+						map.put("pic_Count",picJson.getString("count"));
+						if(picJson.getInt("count") != 0){
+						
+							JSONArray pics = picJson.getJSONArray("pic");
+							for (int j=0;j<picJson.getInt("count");j++){
+								JSONObject jsonPic = pics.getJSONObject(j);
+								map.put("PICsURL", jsonPic.getString("url"));
+								
+								}
+							Log.d("jsonURL",map.get("PICsURL"));
+						}					
 						list.add(map);
-						Log.d("mine",temp.getString("POI_title") );
-				        Log.d("mine",temp.getString("POI_id") );
-				        Log.d("mine",temp.getString("distance") );
-				        //Log.d("mine",temp.getString("PICs"));
+						Log.d("json",temp.getString("POI_title") );
+				        Log.d("json",temp.getString("POI_id") );
+				        Log.d("json",temp.getString("distance") );
+				        Log.d("json",map.get("pic_Count"));
+				        Log.d("json",temp.getString("year"));
+				        
 					}
 						
 					}
@@ -84,8 +100,7 @@ public class DEHAPIReceiver{
 		try{
 			HttpClient client = new DefaultHttpClient();
 			HttpGet request = new HttpGet(url);
-			Log.d("mine", url);
-			//problem found, need Async class to solve this.
+			Log.d("json", url);
 			HttpResponse response = client.execute(request);
 			
 			in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));

@@ -18,6 +18,7 @@ import android.widget.*;
 import android.location.LocationListener;
 import edu.ncue.test.jls.*;
 
+
 public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     /** Called when the activity is first created. */
 	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATE = 1;	//meter
@@ -200,7 +201,6 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		mv.getOverlays().add(itemizedOverlay);
     		
     		
-    		
     		//receiver test
     		
     		if (this.myLocationListener.poiLoadTask.getStatus() != AsyncTask.Status.FINISHED)			
@@ -240,10 +240,13 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     //inner Class
     private class MyLocationListener implements LocationListener{
     	POILoadTask poiLoadTask;
+    	public MyLocationListener(){
+    		super();
+    		poiLoadTask = new POILoadTask();
+    	}
     	public void onLocationChanged(Location location) {
     		String message = String.format("NEW LOCATION Dectected! \n %1$f \n %2$f", location.getLongitude(),location.getLatitude());
     		Toast.makeText(MainMapActivity.this, message, Toast.LENGTH_LONG).show();
-    		poiLoadTask = new POILoadTask();
     		poiLoadTask.execute(location.getLatitude(),location.getLongitude());
     		try {
 				soilist = poiLoadTask.get();
