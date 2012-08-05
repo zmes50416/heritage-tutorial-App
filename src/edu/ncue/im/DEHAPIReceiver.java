@@ -68,19 +68,23 @@ public class DEHAPIReceiver{
 						if(picJson.getInt("count") != 0){
 						
 							JSONArray pics = picJson.getJSONArray("pic");
+							String picsSumURL = new String();
 							for (int j=0;j<picJson.getInt("count");j++){
 								JSONObject jsonPic = pics.getJSONObject(j);
-								map.put("PICsURL", jsonPic.getString("url"));
+								picsSumURL += jsonPic.getString("url")+";";
 								
 								}
+							map.put("PICsURL", picsSumURL);
 							Log.d("jsonURL",map.get("PICsURL"));
 						}					
 						list.add(map);
-						Log.d("json",temp.getString("POI_title") );
-				        Log.d("json",temp.getString("POI_id") );
-				        Log.d("json",temp.getString("distance") );
+						Log.d("json","Title:"+temp.getString("POI_title") );
+				        Log.d("json","id:"+temp.getString("POI_id") );
+				        Log.d("json","longitude:"+temp.getString("longitude"));
+				        Log.d("json","latitude:"+temp.getString("latitude"));
+				        Log.d("json","distance:"+temp.getString("distance") );
 				        Log.d("json",map.get("pic_Count"));
-				        Log.d("json",temp.getString("year"));
+				        Log.d("json","year:"+temp.getString("year"));
 				        
 					}
 						

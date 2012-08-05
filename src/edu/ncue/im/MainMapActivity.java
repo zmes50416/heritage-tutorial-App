@@ -163,11 +163,12 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	if (location != null)
     	{
     		
-    		String message = String.format("CurrentLocation \n Longitude: %1$f \n Latitude: %2$f ", location.getLongitude(),location.getLatitude());
-    		Toast.makeText(MainMapActivity.this, message, Toast.LENGTH_LONG).show();
+    		
     		
     		
     		GeoPoint currentPoint = new GeoPoint((int)(location.getLatitude()*1E6),(int)(location.getLongitude()*1E6));
+    		String message = String.format("CurrentLocation \n Longitude: %d \n Latitude: %d ", currentPoint.getLongitudeE6(),currentPoint.getLatitudeE6());
+    		Toast.makeText(MainMapActivity.this, message, Toast.LENGTH_LONG).show();
     		//retrieve GPS data and zoom to that position
     		mapController.animateTo(currentPoint);
     		mapController.setZoom(16);
@@ -209,6 +210,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.poi), this);
     			for(Map<String, String> map : soilist){
     				GeoPoint gp;
+    				
     				gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
     				OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
     				poiOverlay.addOverlay(poi);
@@ -231,8 +233,16 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     }
     
 	public ArrayList<Map<String, String>> getList(){
-		/*if(soilist == null)
-			soilist = poiLoadTask.get();*/
+		if(soilist == null)
+			try {
+				soilist = this.myLocationListener.poiLoadTask.get();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		return soilist;
 		
 			 
@@ -247,6 +257,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	public void onLocationChanged(Location location) {
     		String message = String.format("NEW LOCATION Dectected! \n %1$f \n %2$f", location.getLongitude(),location.getLatitude());
     		Toast.makeText(MainMapActivity.this, message, Toast.LENGTH_LONG).show();
+    		poiLoadTask = new POILoadTask();
     		poiLoadTask.execute(location.getLatitude(),location.getLongitude());
     		try {
 				soilist = poiLoadTask.get();
