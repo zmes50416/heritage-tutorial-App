@@ -42,7 +42,7 @@ public class BrowseContentActivity extends ListActivity {
 		lv.setOnItemClickListener(new OnItemClickListener(){
 			public void onItemClick(AdapterView<?>parent, View view, int position, long id){
 				Intent intent = new Intent();
-				HashMap<String, String> map = (HashMap)dataList.get(position);
+				HashMap<String, String> map = (HashMap<String, String>)dataList.get(position);
 				Log.d("DetailedContent", map.toString());
 				Bundle bundle = new Bundle();
 				bundle.putSerializable("SinglePOI", map);

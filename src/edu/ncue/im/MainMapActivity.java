@@ -8,12 +8,17 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.*;
 import com.google.android.maps.*;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationSet;
+import android.view.animation.LayoutAnimationController;
+import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import android.location.LocationListener;
 import edu.ncue.test.jls.*;
@@ -21,8 +26,9 @@ import edu.ncue.test.jls.*;
 
 public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     /** Called when the activity is first created. */
-	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATE = 1;	//meter
-	private static final long MINIMUM_TIME_BETWEEN_UPDATE = 1000; 	//milesecond
+	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATE = 0;	//meter
+	private static final long MINIMUM_TIME_BETWEEN_UPDATE = 100; 	//milesecond
+	
 	protected static float DISTANCE_TO_SEARCH = 1000f;				//meter
 	
 	final static String POI_TAPPED_ACTION = "MainMapActivity.POI_TAPPED_ACTION";
@@ -33,8 +39,9 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	protected ImageButton displayListButton;
 	protected MapView mv;
 	protected MapController mapController;
+	protected SeekBar yearSeekbar;
 	protected static MyLocationListener myLocationListener;
-	
+	protected MyLocationOverlay myLocationOverlay;
 	protected SlidingDrawer poiDrawer;
 	protected POILoadTask poiLoadTask;
 	private ArrayList<Map<String, String>>soilist;
@@ -48,14 +55,14 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
         displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
         poiDrawer = (SlidingDrawer)findViewById(R.id.poiDrawer);
-        poiDrawer.setVisibility(View.INVISIBLE);
+        poiDrawer.setVisibility(View.GONE);
         locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         soilist = new ArrayList<Map<String, String>>();
         mv = (MapView) findViewById(R.id.mapview);
         mv.setBuiltInZoomControls(false);	//disable the zoom button
         mapController = mv.getController();
         myLocationListener = new MyLocationListener();
-        
+        poiLoadTask = new POILoadTask();
         gpsButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v) {
 	        		showCurrentLocation();
@@ -135,7 +142,11 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     @Override
     protected void onPause(){
     	super.onPause();
-    	Log.d("gps", "paused");
+    	if(this.myLocationOverlay !=        null){
+    		this.myLocationOverlay.disableMyLocation();
+    		this.myLocationOverlay.disableCompass();
+    	}
+    		Log.d("gps", "paused");
     	locator.removeUpdates(myLocationListener);
     }
     
@@ -143,6 +154,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     protected void onResume(){
     	super.onResume();
     	Log.d("gps", "Resumed");
+    	
     	locator.requestLocationUpdates(
         		LocationManager.GPS_PROVIDER, 
         		MINIMUM_DISTANCE_CHANGE_FOR_UPDATE,
@@ -161,22 +173,23 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     	
     	if (location != null)
-    	{
-    		
-    		
-    		
+    	{ 			
     		
     		GeoPoint currentPoint = new GeoPoint((int)(location.getLatitude()*1E6),(int)(location.getLongitude()*1E6));
-    		String message = String.format("CurrentLocation \n Longitude: %d \n Latitude: %d ", currentPoint.getLongitudeE6(),currentPoint.getLatitudeE6());
-    		Toast.makeText(MainMapActivity.this, message, Toast.LENGTH_LONG).show();
+    		Toast.makeText(MainMapActivity.this,"Current Location \n Longitude: "+currentPoint.getLongitudeE6()+"\n Latitude: "+currentPoint.getLatitudeE6(), Toast.LENGTH_LONG).show();
     		//retrieve GPS data and zoom to that position
     		mapController.animateTo(currentPoint);
     		mapController.setZoom(16);
-    		
+        	
     		if(!mv.getOverlays().isEmpty())//clear the old place first
     			mv.getOverlays().clear();
-    		OverlayItem overlayItem = new OverlayItem(currentPoint, "Current Position","");
     		
+    		//OverlayItem overlayItem = new OverlayItem(currentPoint, "Current Position","");
+    		myLocationOverlay = new MyLocationOverlay(this, this.mv);
+    		myLocationOverlay.enableCompass();
+        	myLocationOverlay.enableMyLocation();
+            
+        	//POI TAPPED ACTION
     		IntentFilter intentFilter = new IntentFilter();
     		intentFilter.addAction(POI_TAPPED_ACTION);
     		this.registerReceiver(new BroadcastReceiver(){
@@ -184,7 +197,22 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 				public void onReceive(Context arg0, Intent arg1) {
 					String title = (String) arg1.getSerializableExtra("POITitle");
 					String snippets = (String) arg1.getSerializableExtra("POISnippet");
-					if(poiDrawer.getVisibility()==View.INVISIBLE){
+					if(poiDrawer.getVisibility()==View.GONE){
+						//pop up animate still have bug
+						/*AnimationSet animateSet = new AnimationSet(true);
+						Animation slideUp = new TranslateAnimation(
+				                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+				                0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
+				                Animation.RELATIVE_TO_SELF, 1.0f);
+						slideUp.setDuration(600);
+						slideUp.setAnimationListener(new AnimationListener(){
+						});
+						animateSet.addAnimation(slideUp);
+						LayoutAnimationController controller = new LayoutAnimationController(animateSet, 0.25f);
+						
+						poiDrawer.startAnimation(slideUp);
+						*/
+						
 						poiDrawer.setVisibility(View.VISIBLE);
 					}
 					TextView drawerTitle = (TextView)poiDrawer.findViewById(R.id.drawerTitle);
@@ -197,17 +225,17 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     			
     		}, intentFilter);
     		
-    		HelloItemizedOverlay itemizedOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
-    		itemizedOverlay.addOverlay(overlayItem);
-    		mv.getOverlays().add(itemizedOverlay);
+    		//POIItemizedOverlay itemizedOverlay = new POIItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
+    		//itemizedOverlay.addOverlay(overlayItem);
+    		//mv.getOverlays().add(itemizedOverlay);
+    		mv.getOverlays().add(myLocationOverlay);
+    		
     		
     		
     		//receiver test
-    		
-    		if (this.myLocationListener.poiLoadTask.getStatus() != AsyncTask.Status.FINISHED)			
-    			Toast.makeText(this, "Haven't get data from server yet", Toast.LENGTH_SHORT).show();
-    		else if(!soilist.isEmpty()){
-    			HelloItemizedOverlay poiOverlay = new HelloItemizedOverlay(this.getResources().getDrawable(R.drawable.poi), this);
+    		this.getList(location.getLatitude(),location.getLongitude());
+    		if(!soilist.isEmpty()){
+    			POIItemizedOverlay poiOverlay = new POIItemizedOverlay(this.getResources().getDrawable(R.drawable.poi), this);
     			for(Map<String, String> map : soilist){
     				GeoPoint gp;
     				
@@ -232,10 +260,11 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	
     }
     
-	public ArrayList<Map<String, String>> getList(){
-		if(soilist == null)
-			try {
-				soilist = this.myLocationListener.poiLoadTask.get();
+	public ArrayList<Map<String, String>> getList(double latitude, double longitude){
+		poiLoadTask = new POILoadTask();
+		poiLoadTask.execute(latitude,longitude);	
+		try {
+				soilist = this.poiLoadTask.get();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -247,32 +276,22 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 		
 			 
 	}
-    //inner Class
+    
+	//inner Class
     private class MyLocationListener implements LocationListener{
-    	POILoadTask poiLoadTask;
+    	
     	public MyLocationListener(){
     		super();
-    		poiLoadTask = new POILoadTask();
+    		
     	}
     	public void onLocationChanged(Location location) {
     		String message = String.format("NEW LOCATION Dectected! \n %1$f \n %2$f", location.getLongitude(),location.getLatitude());
     		Toast.makeText(MainMapActivity.this, message, Toast.LENGTH_LONG).show();
-    		poiLoadTask = new POILoadTask();
-    		poiLoadTask.execute(location.getLatitude(),location.getLongitude());
-    		try {
-				soilist = poiLoadTask.get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		//showCurrentLocation();
+    		getList(location.getLatitude(),location.getLongitude());
     	}
 
     	public void onProviderDisabled(String provider) {
-    		Toast.makeText(MainMapActivity.this,"Provider disabled by the user. GPS turned off",Toast.LENGTH_LONG).show();
+    		Toast.makeText(MainMapActivity.this,"GPS funtion shot down, please turn on GPS to keep most funtion to work",Toast.LENGTH_SHORT).show();
 		
     	}
 
@@ -288,17 +307,31 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	
     }
     
-}
 	//Network must need AsyncTask to run on another thread
-	class POILoadTask extends AsyncTask<Double, Void, ArrayList<Map<String, String>>>{
-		
+	private class POILoadTask extends AsyncTask<Double, Void, ArrayList<Map<String, String>>>{
+		ProgressDialog p;
+		@Override
+		protected void onPreExecute(){
+			super.onPreExecute();
+			Log.d("progress", "task onPreExecute");
+			p = ProgressDialog.show(MainMapActivity.this, "Downloading", "¦Û¦øªA¾¹¤U¸ü¸ê®Æ¤¤...");
+		}
 		
 		@Override
 		protected ArrayList<Map<String, String>> doInBackground(Double... params) {
 			DEHAPIReceiver receiver = new DEHAPIReceiver(params[0],params[1],MainMapActivity.DISTANCE_TO_SEARCH);
 			return receiver.getsoilist();
+			
+		}
+		@Override
+		protected void onPostExecute(ArrayList<Map<String, String>> result){
+			super.onPostExecute(result);
+			Log.d("progress", "task onPostExecute");
+			p.dismiss();
 		}
 		
 
 		
 	}
+    
+}

@@ -63,6 +63,7 @@ public class DEHAPIReceiver{
 						map.put("latitude", temp.getString("latitude"));
 						map.put("longitude", temp.getString("longitude"));
 						map.put("POI_description",temp.getString("POI_description"));
+						map.put("POI_year", temp.getString("year"));
 						JSONObject picJson = temp.getJSONObject("PICs");
 						map.put("pic_Count",picJson.getString("count"));
 						if(picJson.getInt("count") != 0){
@@ -123,6 +124,7 @@ public class DEHAPIReceiver{
 			
 			e.getMessage();
 			e.printStackTrace();
+			
 			return null;
 		}
 	}

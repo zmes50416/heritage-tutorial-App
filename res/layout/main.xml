@@ -32,7 +32,13 @@
     			    android:scaleType = "fitCenter" />
 
 	</LinearLayout>
-
+	
+    <SeekBar
+        android:id="@+id/year_seekBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/mapview"
+        />
 <com.google.android.maps.MapView
     android:id="@+id/mapview"
     android:layout_width="match_parent"
@@ -82,12 +88,11 @@
     <TextView
         android:id="@+id/POIcontent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/White"
         android:textColor="@color/Black"
         android:text = "" />
 
 	</ScrollView>
 </SlidingDrawer>
-
 </RelativeLayout>
