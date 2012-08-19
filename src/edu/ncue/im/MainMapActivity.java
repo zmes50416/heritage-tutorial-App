@@ -61,6 +61,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         mv = (MapView) findViewById(R.id.mapview);
         mv.setBuiltInZoomControls(false);	//disable the zoom button
         mapController = mv.getController();
+        myLocationOverlay = new MyLocationOverlay(this, this.mv);
         myLocationListener = new MyLocationListener();
         poiLoadTask = new POILoadTask();
         gpsButton.setOnClickListener(new OnClickListener(){
@@ -124,7 +125,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         		if(location != null){//passing currentGeoData to ListView
         			
             		Bundle bundle = new Bundle();
-            		new POILoadTask().execute(location.getLatitude(),location.getLongitude());
+            		getList(location.getLatitude(),location.getLongitude());
         			bundle.putSerializable("POI", soilist);
         			intent.putExtras(bundle);
         			//bundle.putDouble("CurrentLongitude", location.getLongitude());
@@ -185,7 +186,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     			mv.getOverlays().clear();
     		
     		//OverlayItem overlayItem = new OverlayItem(currentPoint, "Current Position","");
-    		myLocationOverlay = new MyLocationOverlay(this, this.mv);
+    		
     		myLocationOverlay.enableCompass();
         	myLocationOverlay.enableMyLocation();
             
@@ -259,11 +260,17 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	}
     	
     }
-    
+	Location oldLocation;
 	public ArrayList<Map<String, String>> getList(double latitude, double longitude){
-		poiLoadTask = new POILoadTask();
-		poiLoadTask.execute(latitude,longitude);	
-		try {
+		Location currentLocation = new Location("currentLocation");
+		
+		currentLocation.setLatitude(latitude);
+		currentLocation.setLongitude(longitude);
+		if(soilist.isEmpty() || oldLocation == null){
+			oldLocation = new Location("oldLocation");
+			poiLoadTask = new POILoadTask();
+			poiLoadTask.execute(latitude, longitude);
+			try {
 				soilist = this.poiLoadTask.get();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -272,6 +279,33 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			oldLocation.setLatitude(latitude);
+			oldLocation.setLongitude(longitude);
+			return soilist;
+		}
+		
+		float distance = currentLocation.distanceTo(oldLocation);
+		if (distance > 250) {
+				poiLoadTask = new POILoadTask();
+				poiLoadTask.execute(latitude, longitude);
+				try {
+					soilist = this.poiLoadTask.get();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				oldLocation.setLatitude(latitude);
+				oldLocation.setLongitude(longitude);
+				Log.d("GPS", "Distance:"+distance);
+			}
+			else
+				Log.d("GPS", "Too Near Distance:"+distance);
+		
+		
+		
 		return soilist;
 		
 			 
