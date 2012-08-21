@@ -25,7 +25,8 @@ import android.util.Log;
  */
 
 public class DEHAPIReceiver{
-	final static String POI_ID = "id", POI_TiTle = "title", POI_DISTANCE = "distance", POI_LATITUDE ="latitude", POI_LONGTITUE = "longitude", POI_DESCRIPTION = "description";
+	final static String POI_ID = "id", POI_TiTle = "title", POI_DISTANCE = "distance", POI_LATITUDE ="latitude", 
+			POI_LONGTITUE = "longitude", POI_DESCRIPTION = "description", POI_YEAR = "year";
 	String formatted_result;
 	String request_URL;
 	private ArrayList<Map<String, String>> soilist;
@@ -63,7 +64,7 @@ public class DEHAPIReceiver{
 						map.put("latitude", temp.getString("latitude"));
 						map.put("longitude", temp.getString("longitude"));
 						map.put("POI_description",temp.getString("POI_description"));
-						map.put("POI_year", temp.getString("year"));
+						map.put(POI_YEAR, temp.getString("year"));
 						JSONObject picJson = temp.getJSONObject("PICs");
 						map.put("pic_Count",picJson.getString("count"));
 						if(picJson.getInt("count") != 0){

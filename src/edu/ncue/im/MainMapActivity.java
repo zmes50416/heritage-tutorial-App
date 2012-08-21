@@ -20,13 +20,14 @@ import android.view.animation.AnimationSet;
 import android.view.animation.LayoutAnimationController;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.location.LocationListener;
 import edu.ncue.test.jls.*;
 
 
 public class MainMapActivity extends MapActivity{//繼承mapActivity
     /** Called when the activity is first created. */
-	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATE = 0;	//meter
+	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATE = 10;	//meter
 	private static final long MINIMUM_TIME_BETWEEN_UPDATE = 100; 	//milesecond
 	
 	protected static float DISTANCE_TO_SEARCH = 1000f;				//meter
@@ -39,17 +40,25 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 	protected ImageButton displayListButton;
 	protected MapView mv;
 	protected MapController mapController;
-	protected SeekBar yearSeekbar;
+	protected SeekBar yearSeekBar;
 	protected static MyLocationListener myLocationListener;
 	protected MyLocationOverlay myLocationOverlay;
 	protected SlidingDrawer poiDrawer;
 	protected POILoadTask poiLoadTask;
-	private ArrayList<Map<String, String>>soilist;
+	protected ArrayList<Map<String, String>>soilist;
+	protected int yearToSearch; 
+	protected TextView yearTextView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);	//設定layout
         
+        yearToSearch = 0;
+        yearSeekBar = (SeekBar) findViewById(R.id.year_seekBar);
+        yearSeekBar.setMax(2000);
+        
+        yearSeekBar.setEnabled(false);
+        yearTextView = (TextView) findViewById(R.id.year_TextView);
         
         gpsButton = (Button) findViewById(R.id.retrieve_Location_Button);	//create button&View
         searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
@@ -136,7 +145,30 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
         		
         	}
         });
-        
+        yearSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+        	
+        	Boolean isDrawed;
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				// TODO Auto-generated method stub
+				yearToSearch = progress;
+				isDrawed = drawOnMap();
+				mv.invalidate();
+				yearTextView.setText(String.valueOf(yearToSearch));
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				if(isDrawed = false)
+					Toast.makeText(getApplication(),"已無符合年代以上之景點",Toast.LENGTH_LONG).show();
+			}
+        	
+        });
         
     }
     
@@ -172,7 +204,8 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     
 	protected void showCurrentLocation(){
     	Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    	
+    	if (location == null)
+    		location = locator.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
     	if (location != null)
     	{ 			
     		
@@ -189,7 +222,6 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     		
     		myLocationOverlay.enableCompass();
         	myLocationOverlay.enableMyLocation();
-            
         	//POI TAPPED ACTION
     		IntentFilter intentFilter = new IntentFilter();
     		intentFilter.addAction(POI_TAPPED_ACTION);
@@ -233,33 +265,47 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     		
     		
     		
-    		//receiver test
-    		this.getList(location.getLatitude(),location.getLongitude());
-    		if(!soilist.isEmpty()){
-    			POIItemizedOverlay poiOverlay = new POIItemizedOverlay(this.getResources().getDrawable(R.drawable.poi), this);
-    			for(Map<String, String> map : soilist){
-    				GeoPoint gp;
-    				
-    				gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
-    				OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
-    				poiOverlay.addOverlay(poi);
-    			}
-    			mv.getOverlays().add(poiOverlay);
-    		}else{
-    			Toast.makeText(getApplication(),"Can't Find Any POI in distance",Toast.LENGTH_LONG).show();
-    		}
-    		
-    		//receiver test
+    		getList(location.getLatitude(),location.getLongitude());
+    		if(drawOnMap()!= true)
+    			Toast.makeText(getApplication(),"無符合年代以上之景點",Toast.LENGTH_LONG).show();
+    		yearSeekBar.setEnabled(true);
     		
     		mv.invalidate();
     		
     	}
     	else
     	{
-    		Toast.makeText(getApplication(), "Currently cant get the Device's Location.",Toast.LENGTH_LONG).show();
+    		Toast.makeText(getApplication(), "無法取得您所在的位址，請稍後再試。",Toast.LENGTH_LONG).show();
     	}
     	
     }
+	POIItemizedOverlay oldpoiOverlay;
+	protected boolean drawOnMap(){
+		if(!soilist.isEmpty()){
+			POIItemizedOverlay poiOverlay = new POIItemizedOverlay(this.getResources().getDrawable(R.drawable.poi), this);
+			if(oldpoiOverlay != null){
+				mv.getOverlays().remove(oldpoiOverlay);
+			}
+			for(Map<String, String> map : soilist){
+				GeoPoint gp;
+				if(Integer.parseInt(map.get(DEHAPIReceiver.POI_YEAR))>=this.yearToSearch){
+					gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
+					OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
+					poiOverlay.addOverlay(poi);
+				}
+			}
+			if(poiOverlay.size() != 0){
+				mv.getOverlays().add(poiOverlay);
+				oldpoiOverlay = poiOverlay;
+				return true;
+			}
+			else 
+				return false;
+		}else{
+			return false;
+		}
+		
+	}
 	Location oldLocation;
 	public ArrayList<Map<String, String>> getList(double latitude, double longitude){
 		Location currentLocation = new Location("currentLocation");
@@ -321,7 +367,8 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     	public void onLocationChanged(Location location) {
     		String message = String.format("NEW LOCATION Dectected! \n %1$f \n %2$f", location.getLongitude(),location.getLatitude());
     		Toast.makeText(MainMapActivity.this, message, Toast.LENGTH_LONG).show();
-    		getList(location.getLatitude(),location.getLongitude());
+    		//
+    		//getList(location.getLatitude(),location.getLongitude());
     	}
 
     	public void onProviderDisabled(String provider) {
