@@ -16,7 +16,9 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault"
          >
-        <uses-library android:name ="com.google.android.maps" />
+        <uses-library android:required="true" 
+  		android:name="com.google.android.maps">
+		</uses-library> 
         <activity
             android:label="@string/app_name"
             android:name="edu.ncue.im.MainMapActivity" >
@@ -30,6 +32,7 @@
         
         <activity android:name="edu.ncue.im.BrowseContentActivity"></activity>
         <activity android:name="edu.ncue.im.ContentDetailActivity"></activity>
+        <activity android:name="edu.ncue.im.SocialLoginActivity"></activity>
     </application>
     
 

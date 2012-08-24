@@ -4,12 +4,15 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.*;
+
 import com.google.android.maps.*;
 import android.util.Log;
 import android.view.View;
@@ -34,7 +37,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	
 	final static String POI_TAPPED_ACTION = "MainMapActivity.POI_TAPPED_ACTION";
 	
-	protected LocationManager locator;	
+	protected LocationManager locationManager;	
 	protected Button gpsButton;
 	protected ImageButton searchButton;
 	protected ImageButton displayListButton;
@@ -65,7 +68,8 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
         poiDrawer = (SlidingDrawer)findViewById(R.id.poiDrawer);
         poiDrawer.setVisibility(View.GONE);
-        locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         soilist = new ArrayList<Map<String, String>>();
         mv = (MapView) findViewById(R.id.mapview);
         mv.setBuiltInZoomControls(false);	//disable the zoom button
@@ -89,7 +93,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 
 						Boolean findFlag = false;
 						//Editable value = input.getText();
-						Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+						Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 						if(location != null){
 							//new foundList to save the result
 							ArrayList<Map<String, String>> foundList = new ArrayList<Map<String, String>>();
@@ -130,7 +134,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         displayListButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
         		Intent intent = new Intent();
-        		Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         		if(location != null){//passing currentGeoData to ListView
         			
             		Bundle bundle = new Bundle();
@@ -169,7 +173,31 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 			}
         	
         });
+        if(!locationEnabled){
+        	AlertDialog.Builder builder = new AlertDialog.Builder(MainMapActivity.this);
+    		builder.setMessage("GPS¥\¯àÃö³¬¤¤¡A¬O§_«e©¹³]©w¶}±Ò?")
+    			.setCancelable(true)
+    			.setPositiveButton("³]©w", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+						startActivity(intent);
+					}
+				})
+				.setNegativeButton("µy«á", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+						
+					}
+				});
+    		AlertDialog alert = builder.create();
+    		alert.show();
+        }
         
+        this.login();
     }
     
     @Override
@@ -180,7 +208,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		this.myLocationOverlay.disableCompass();
     	}
     		Log.d("gps", "paused");
-    	locator.removeUpdates(myLocationListener);
+    	locationManager.removeUpdates(myLocationListener);
     }
     
     @Override
@@ -188,7 +216,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	super.onResume();
     	Log.d("gps", "Resumed");
     	
-    	locator.requestLocationUpdates(
+    	locationManager.requestLocationUpdates(
         		LocationManager.GPS_PROVIDER, 
         		MINIMUM_DISTANCE_CHANGE_FOR_UPDATE,
         		MINIMUM_TIME_BETWEEN_UPDATE, 
@@ -203,9 +231,9 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     }
     
 	protected void showCurrentLocation(){
-    	Location location = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    	Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     	if (location == null)
-    		location = locator.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+    		location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
     	if (location != null)
     	{ 			
     		
@@ -222,6 +250,11 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		
     		myLocationOverlay.enableCompass();
         	myLocationOverlay.enableMyLocation();
+        	myLocationOverlay.runOnFirstFix(new Runnable() {
+  			  public void run() {
+  			    mapController.animateTo(myLocationOverlay.getMyLocation());
+  			     }
+  			});
         	//POI TAPPED ACTION
     		IntentFilter intentFilter = new IntentFilter();
     		intentFilter.addAction(POI_TAPPED_ACTION);
@@ -306,6 +339,10 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 		}
 		
 	}
+	
+	protected void login(){
+		startActivity(new Intent().setClass(getApplicationContext(), SocialLoginActivity.class));
+	}
 	Location oldLocation;
 	public ArrayList<Map<String, String>> getList(double latitude, double longitude){
 		Location currentLocation = new Location("currentLocation");
@@ -377,12 +414,12 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	}
 
     	public void onProviderEnabled(String provider) {
-    		Toast.makeText(MainMapActivity.this,"Provider enabled by the user. GPS turned ON",Toast.LENGTH_LONG).show();
+    		Toast.makeText(MainMapActivity.this,"Provider enabled by the user. GPS turned ON",Toast.LENGTH_SHORT).show();
 		
     	}
 
     	public void onStatusChanged(String provider, int i, Bundle extras) {
-    		Toast.makeText(MainMapActivity.this, "Provider StatusChanged", Toast.LENGTH_LONG).show();
+    		Toast.makeText(MainMapActivity.this, "Provider StatusChanged", Toast.LENGTH_SHORT).show();
 		
     	}
 	
