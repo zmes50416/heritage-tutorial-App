@@ -17,19 +17,26 @@
             android:layout_height="fill_parent"
             android:contentDescription="mainPic"
             android:scaleType="fitCenter" />
-
+		<Button
+            android:id="@+id/likebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="打卡" />
+        
+        
+        </LinearLayout>
         <TextView
             android:id="@+id/descripe_of_POI"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingRight="5dip"
             android:textSize="20dip" />
-        </LinearLayout>
         <ScrollView 
             android:id="@+id/contentScrollView"
             android:layout_height="fill_parent"
             android:layout_width="fill_parent"
             >
+		
         </ScrollView>
     
 </LinearLayout>

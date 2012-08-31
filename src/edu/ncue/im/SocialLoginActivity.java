@@ -1,10 +1,21 @@
 package edu.ncue.im;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.facebook.android.*;
+import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.Facebook.*;
 import edu.ncue.test.jls.R;
 
@@ -13,7 +24,7 @@ public class SocialLoginActivity extends Activity {
 	public static final String APP_ID = "273315202770124";
 	String[] permissions = { "publish_stream", "offline_access"};
 	
-	Facebook facebook = new Facebook(APP_ID);
+	public static Facebook facebook = new Facebook(APP_ID);
 	private SharedPreferences mPrefs;
 	
 	 @Override
@@ -65,6 +76,10 @@ public class SocialLoginActivity extends Activity {
 					});
 
 		}
+		else
+			Toast.makeText(getApplication(),"FB profile: ¤wµn¤J",Toast.LENGTH_LONG).show();
+		
+		finish();
 		 
 	}
 	 
@@ -72,8 +87,9 @@ public class SocialLoginActivity extends Activity {
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		super.onActivityResult(requestCode, resultCode, data);
 		facebook.authorizeCallback(requestCode, resultCode, data);
-		finish();
 	}
+	
+	
 	
 	
 	

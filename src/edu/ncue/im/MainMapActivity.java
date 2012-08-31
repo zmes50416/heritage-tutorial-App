@@ -17,11 +17,6 @@ import com.google.android.maps.*;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationSet;
-import android.view.animation.LayoutAnimationController;
-import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.location.LocationListener;
@@ -134,11 +129,16 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
         displayListButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
         		Intent intent = new Intent();
+        		
         		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        		if(location == null)
+        			location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        		
         		if(location != null){//passing currentGeoData to ListView
         			
             		Bundle bundle = new Bundle();
             		getList(location.getLatitude(),location.getLongitude());
+            		Log.d("data", soilist.toString());
         			bundle.putSerializable("POI", soilist);
         			intent.putExtras(bundle);
         			//bundle.putDouble("CurrentLongitude", location.getLongitude());
@@ -168,7 +168,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				if(isDrawed = false)
+				if(isDrawed == false)
 					Toast.makeText(getApplication(),"已無符合年代以上之景點",Toast.LENGTH_LONG).show();
 			}
         	
@@ -232,8 +232,10 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     
 	protected void showCurrentLocation(){
     	Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    	if (location == null)
+    	if (location == null){
     		location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+    		Log.d("dev", "Location provide from Network");
+    	}
     	if (location != null)
     	{ 			
     		
