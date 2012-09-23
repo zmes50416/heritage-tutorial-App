@@ -50,25 +50,8 @@ public class ContentDetailActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				if(facebook.isSessionValid()){
 					test ="failed";
-					/*new Thread(){
-						@Override
-						public void run(){
-							try {
-								test = facebook.request("me");
-							} catch (MalformedURLException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-							
-						}
-					}.run();*/
 					
 					AsyncFacebookRunner as = new AsyncFacebookRunner(facebook);
 					//as.request("me", new UserRequestListener());

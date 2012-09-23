@@ -2,17 +2,24 @@ package edu.ncue.im;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.*;
 
 import com.facebook.android.*;
 import com.facebook.android.AsyncFacebookRunner.RequestListener;
@@ -23,18 +30,23 @@ public class SocialLoginActivity extends Activity {
 
 	public static final String APP_ID = "273315202770124";
 	String[] permissions = { "publish_stream", "offline_access"};
-	
+	private String name;
+	private String imageURL;
+	TextView userName;
+	ImageView userPicView;
 	public static Facebook facebook = new Facebook(APP_ID);
 	private SharedPreferences mPrefs;
-	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
 		 super.onCreate(savedInstanceState);
 		 setContentView(R.layout.social_login);
-		 
+		 userName = (TextView)findViewById(R.id.userNameTextView);
+		 Button logoutButton = (Button)findViewById(R.id.facebookLogOutButton);
+		 userPicView = (ImageView)findViewById(R.id.userPictureImageView);
 		 mPrefs = this.getPreferences(MODE_PRIVATE);
 		 String access_token = mPrefs.getString("access_token", null);
 		 long expires = mPrefs.getLong("access_expires", 0);
+		 // still have bug when u log out fb app and we still holding the old token.
 		 if(access_token != null){
 			 facebook.setAccessToken(access_token);
 		 }
@@ -77,9 +89,22 @@ public class SocialLoginActivity extends Activity {
 
 		}
 		else
-			Toast.makeText(getApplication(),"FB profile: 已登入",Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplication(),"FB profile:"+ userName +" 已登入",Toast.LENGTH_LONG).show();
 		
-		finish();
+		AsyncFacebookRunner as = new AsyncFacebookRunner(facebook);
+		Bundle params = new Bundle();
+		params.putString("fields","picture.type(large),name");
+        as.request("me", params, new UserReuestListener());
+		logoutButton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				finish();
+				
+			}
+			
+		});
+		
 		 
 	}
 	 
@@ -89,8 +114,71 @@ public class SocialLoginActivity extends Activity {
 		facebook.authorizeCallback(requestCode, resultCode, data);
 	}
 	
-	
-	
-	
+	Bitmap bitmap;
+	class UserReuestListener implements RequestListener{
+
+		@Override
+		public void onComplete(String response,
+				Object state) {
+			JSONObject jsonObject;
+			try{
+				jsonObject = new JSONObject(response);
+				Log.d("json", "FBJSON:"+response);
+				name = jsonObject.getString("name");
+				imageURL = new JSONObject(jsonObject.getString("picture")).getJSONObject("data").getString("url");
+				
+				try {
+					bitmap = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
+					
+                } catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				SocialLoginActivity.this.runOnUiThread(new Runnable() {
+	                public void run(){
+	                    userName.setText(name);
+	                    userPicView.setImageBitmap(bitmap);
+	                }
+	            });
+
+				
+				
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			
+			
+		}
+
+		@Override
+		public void onIOException(IOException e,
+				Object state) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onFileNotFoundException(
+				FileNotFoundException e, Object state) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onMalformedURLException(
+				MalformedURLException e, Object state) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onFacebookError(FacebookError e,
+				Object state) {
+			// TODO Auto-generated method stub
+			
+		}
+ 	
+ }
 	
 }

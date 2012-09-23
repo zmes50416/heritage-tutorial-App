@@ -6,9 +6,21 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.*;
@@ -108,7 +120,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 								startActivity(intent);
 							}
 							if(findFlag == false){
-								Toast.makeText(getApplicationContext(), "Cant Find Any Point contains "+input.getText(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(getApplicationContext(), "Can't Find Any Point contains "+input.getText(), Toast.LENGTH_SHORT).show();
 							}
 						}
 							
@@ -118,7 +130,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
         		});
         		alert.setNegativeButton("Cancle",new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
-						
+						//cancel search
 					}
 				});
         		
@@ -155,7 +167,6 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
-				// TODO Auto-generated method stub
 				yearToSearch = progress;
 				isDrawed = drawOnMap();
 				mv.invalidate();
@@ -321,9 +332,9 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			if(oldpoiOverlay != null){
 				mv.getOverlays().remove(oldpoiOverlay);
 			}
-			for(Map<String, String> map : soilist){
+			for(Map<String, String> map : soilist){	//check every point are in the year
 				GeoPoint gp;
-				if(Integer.parseInt(map.get(DEHAPIReceiver.POI_YEAR))>=this.yearToSearch){
+				if(Integer.parseInt(map.get(POILoadTask.POI_YEAR))>=this.yearToSearch){
 					gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
 					OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
 					poiOverlay.addOverlay(poi);
@@ -341,7 +352,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 		}
 		
 	}
-	
+	//Facebook Login
 	protected void login(){
 		startActivity(new Intent().setClass(getApplicationContext(), SocialLoginActivity.class));
 	}
@@ -358,10 +369,8 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			try {
 				soilist = this.poiLoadTask.get();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			oldLocation.setLatitude(latitude);
@@ -426,10 +435,22 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     	}
 	
     }
-    
+    /*
+     * 試存取DEP API POI Request
+     * 傳出Request 並取得JSON回應
+     * 最後處理成一份ArrayList
+     */
 	//Network must need AsyncTask to run on another thread
 	private class POILoadTask extends AsyncTask<Double, Void, ArrayList<Map<String, String>>>{
 		ProgressDialog p;
+		final static String POI_ID = "id", POI_TiTle = "title", POI_DISTANCE = "distance", POI_LATITUDE ="latitude", 
+				POI_LONGTITUE = "longitude", POI_DESCRIPTION = "description", POI_YEAR = "year";
+		String formatted_result;
+		String request_URL;
+		private ArrayList<Map<String, String>> soilist;
+		
+		protected JSONObject jsonObjcet;
+		protected JSONArray jsonList;
 		@Override
 		protected void onPreExecute(){
 			super.onPreExecute();
@@ -439,8 +460,17 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 		
 		@Override
 		protected ArrayList<Map<String, String>> doInBackground(Double... params) {
-			DEHAPIReceiver receiver = new DEHAPIReceiver(params[0],params[1],MainMapActivity.DISTANCE_TO_SEARCH);
-			return receiver.getsoilist();
+			
+			request_URL ="http://deh.csie.ncku.edu.tw/dehencode/json/nearbyPOIs?lat="+params[0]+"&lng="+params[1]+"&dist="+MainMapActivity.DISTANCE_TO_SEARCH;
+			soilist = new ArrayList<Map<String,String>>();
+			try{
+				formatted_result = this.sentHttpRequest(request_URL);
+				soilist = parseJson(formatted_result);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			
+			return this.getsoilist();
 			
 		}
 		@Override
@@ -448,6 +478,90 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			super.onPostExecute(result);
 			Log.d("progress", "task onPostExecute");
 			p.dismiss();
+		}
+		
+		private ArrayList<Map<String, String>> parseJson(String str)throws JSONException{
+			ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
+			if(formatted_result!=null){
+				//formatted_result = purge(formatted_result);
+				jsonObjcet = new JSONObject(str);
+				JSONArray soilist = jsonObjcet.getJSONArray("results");
+				
+				
+				for(int i=0;i<soilist.length();i++){
+					JSONObject temp = soilist.getJSONObject(i);
+					
+					//add hashmap to ArrayList
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("POI_id", temp.getString("POI_id"));
+					map.put("POI_title", temp.getString("POI_title"));
+					map.put("distance", temp.getString("distance"));
+					map.put("latitude", temp.getString("latitude"));
+					map.put("longitude", temp.getString("longitude"));
+					map.put("POI_description",temp.getString("POI_description"));
+					map.put(POI_YEAR, temp.getString("year"));
+					JSONObject picJson = temp.getJSONObject("PICs");
+					map.put("pic_Count",picJson.getString("count"));
+					if(picJson.getInt("count") != 0){
+					
+						JSONArray pics = picJson.getJSONArray("pic");
+						String picsSumURL = new String();
+						for (int j=0;j<picJson.getInt("count");j++){
+							JSONObject jsonPic = pics.getJSONObject(j);
+							picsSumURL += jsonPic.getString("url")+";";
+							
+							}
+						map.put("PICsURL", picsSumURL);
+						Log.d("jsonURL",map.get("PICsURL"));
+					}					
+					list.add(map);
+					Log.d("json","Title:"+temp.getString("POI_title") );
+			        Log.d("json","id:"+temp.getString("POI_id") );
+			        Log.d("json","longitude:"+temp.getString("longitude"));
+			        Log.d("json","latitude:"+temp.getString("latitude"));
+			        Log.d("json","distance:"+temp.getString("distance") );
+			        Log.d("json",map.get("pic_Count"));
+			        Log.d("json","year:"+temp.getString("year"));
+			        
+				}
+					
+				}
+			else
+				Log.d("mine","Null List");
+				return list;
+			}
+		
+		private String sentHttpRequest(String url) throws Exception{
+			BufferedReader in = null;
+			try{
+				HttpClient client = new DefaultHttpClient();
+				HttpGet request = new HttpGet(url);
+				Log.d("json", url);
+				HttpResponse response = client.execute(request);
+				
+				in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+				StringBuffer sb = new StringBuffer("");
+				String line = "";
+				String NL = System.getProperty("line.separator");
+				
+				while((line = in.readLine())!= null){
+					sb.append(line+NL);
+				}
+				in.close();
+				
+				String result = sb.toString();
+				return result;
+			}catch(Exception e){
+				
+				e.getMessage();
+				e.printStackTrace();
+				
+				return null;
+			}
+		}
+		
+		public ArrayList<Map<String, String>> getsoilist(){
+			return soilist;
 		}
 		
 
