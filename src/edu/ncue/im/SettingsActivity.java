@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -26,7 +28,7 @@ import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.Facebook.*;
 import edu.ncue.test.jls.R;
 
-public class SocialLoginActivity extends Activity {
+public class SettingsActivity extends Activity {
 
 	public static final String APP_ID = "273315202770124";
 	String[] permissions = { "publish_stream", "offline_access"};
@@ -36,10 +38,26 @@ public class SocialLoginActivity extends Activity {
 	ImageView userPicView;
 	public static Facebook facebook = new Facebook(APP_ID);
 	private SharedPreferences mPrefs;
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()){
+		case android.R.id.home:
+			Intent intent = new Intent(this, MainMapActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+		
+	}
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
 		 super.onCreate(savedInstanceState);
-		 setContentView(R.layout.social_login);
+		 setContentView(R.layout.settings);
+		 
+		 ActionBar actionBar = getActionBar();
+		 actionBar.setDisplayHomeAsUpEnabled(true);
 		 userName = (TextView)findViewById(R.id.userNameTextView);
 		 Button logoutButton = (Button)findViewById(R.id.facebookLogOutButton);
 		 userPicView = (ImageView)findViewById(R.id.userPictureImageView);
@@ -86,7 +104,6 @@ public class SocialLoginActivity extends Activity {
 						}
 
 					});
-
 		}
 		else
 			Toast.makeText(getApplication(),"FB profile:"+ userName +" ¤wµn¤J",Toast.LENGTH_LONG).show();
@@ -134,7 +151,7 @@ public class SocialLoginActivity extends Activity {
 					e.printStackTrace();
 				}
 				
-				SocialLoginActivity.this.runOnUiThread(new Runnable() {
+				SettingsActivity.this.runOnUiThread(new Runnable() {
 	                public void run(){
 	                    userName.setText(name);
 	                    userPicView.setImageBitmap(bitmap);

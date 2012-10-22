@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.content.*;
@@ -19,10 +20,26 @@ public class BrowseContentActivity extends ListActivity {
 	protected String[] POI_NAME;
 	protected ArrayList<Map<String, String>> dataList;
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()){
+		case android.R.id.home:
+			Intent intent = new Intent(this, MainMapActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+			
+	}
+	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		 
 		dataList = (ArrayList<Map<String, String>>) this.getIntent().getSerializableExtra("POI");
 		if(dataList != null){
 			int i =0;

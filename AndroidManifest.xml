@@ -32,7 +32,7 @@
         
         <activity android:name="edu.ncue.im.BrowseContentActivity"></activity>
         <activity android:name="edu.ncue.im.ContentDetailActivity"></activity>
-        <activity android:name="edu.ncue.im.SocialLoginActivity"></activity>
+        <activity android:name="edu.ncue.im.SettingsActivity"></activity>
     </application>
     
 

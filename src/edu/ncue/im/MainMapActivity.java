@@ -409,7 +409,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 			}
 			for(Map<String, String> map : soilist){	//check every point are in the year
 				GeoPoint gp;
-				if(Integer.parseInt(map.get(POILoadTask.POI_YEAR))>=this.yearToSearch){
+				if(Integer.parseInt(map.get("POI_YEAR"))>=this.yearToSearch){
 					gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
 					OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
 					poiOverlay.addOverlay(poi);
@@ -429,7 +429,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	}
 	//Facebook Login
 	protected void login(){
-		startActivity(new Intent().setClass(getApplicationContext(), SocialLoginActivity.class));
+		startActivity(new Intent().setClass(getApplicationContext(), SettingsActivity.class));
 	}
 	Location oldLocation;
 	public ArrayList<Map<String, String>> getList(double latitude, double longitude){
@@ -518,8 +518,6 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	//Network must need AsyncTask to run on another thread
 	private class POILoadTask extends AsyncTask<Double, Void, ArrayList<Map<String, String>>>{
 		ProgressDialog p;
-		final static String POI_ID = "id", POI_TiTle = "title", POI_DISTANCE = "distance", POI_LATITUDE ="latitude", 
-				POI_LONGTITUE = "longitude", POI_DESCRIPTION = "description", POI_YEAR = "year";
 		String formatted_result;
 		String request_URL;
 		private ArrayList<Map<String, String>> soilist;
@@ -574,7 +572,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 					map.put("latitude", temp.getString("latitude"));
 					map.put("longitude", temp.getString("longitude"));
 					map.put("POI_description",temp.getString("POI_description"));
-					map.put(POI_YEAR, temp.getString("year"));
+					map.put("POI_YEAR", temp.getString("year"));
 					JSONObject picJson = temp.getJSONObject("PICs");
 					map.put("pic_Count",picJson.getString("count"));
 					if(picJson.getInt("count") != 0){
