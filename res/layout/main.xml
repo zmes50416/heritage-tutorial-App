@@ -3,45 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <LinearLayout
-        android:id ="@+id/navigationBar"
-        android:layout_width="fill_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal" >
-    			<ImageButton
-    			    android:id="@+id/pop_keyboard_Button"
-    			    android:layout_width="fill_parent"
-    			    android:layout_height="fill_parent"
-    			    android:src="@drawable/selector_find"
-    			    android:layout_weight="1"
-    			    android:scaleType="fitCenter" />
-    			<Button
-    			    android:id="@+id/retrieve_Location_Button"
-    			    android:layout_width="fill_parent"
-    			    android:layout_height="fill_parent"
-    			    android:layout_weight="1"
-    			    android:text="@string/retriveButton" />
-    			<ImageButton
-    			    android:id="@+id/display_list_Button"
-    			    android:layout_width="fill_parent"
-    			    android:layout_height="wrap_content"
-    			    android:layout_weight="1"
-    			    android:src="@drawable/selector_list"
-    			    android:scaleType = "fitCenter" />
-
-	</LinearLayout>
-	
-    
+	
 <com.google.android.maps.MapView
     android:id="@+id/mapview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_below="@+id/yearLayout"
     android:apiKey="@string/googleMap_API"
-    android:clickable="true"
-    android:layout_below = "@+id/year_seekBar"
-    >
+    android:clickable="true" >
 
 </com.google.android.maps.MapView>
 
@@ -90,13 +59,19 @@
 
 	</ScrollView>
 </SlidingDrawer>
-
+
+<RelativeLayout
+    android:id="@+id/yearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentTop="true" >
+
 <SeekBar
     android:id="@+id/year_seekBar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentLeft="true"
-    android:layout_below="@id/navigationBar"
     android:layout_toLeftOf="@+id/year_TextView"
     android:max="100"
     android:progress="0" />
@@ -111,5 +86,5 @@
     android:layout_alignTop="@+id/year_seekBar"
     android:text="TextView"
     />
-
+</RelativeLayout>
 </RelativeLayout>

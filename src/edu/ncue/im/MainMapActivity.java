@@ -1,11 +1,5 @@
 package edu.ncue.im;
 
-import android.location.Location;
-import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.provider.Settings;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -21,19 +15,49 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.*;
-
-import com.google.android.maps.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationSet;
+import android.view.animation.LayoutAnimationController;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.location.LocationListener;
-import edu.ncue.test.jls.*;
+import android.widget.SlidingDrawer;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
+import com.google.android.maps.MapView;
+import com.google.android.maps.MyLocationOverlay;
+import com.google.android.maps.OverlayItem;
+
+import edu.ncue.test.jls.R;
 
 public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     /** Called when the activity is first created. */
@@ -45,9 +69,9 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	final static String POI_TAPPED_ACTION = "MainMapActivity.POI_TAPPED_ACTION";
 	
 	protected LocationManager locationManager;	
-	protected Button gpsButton;
-	protected ImageButton searchButton;
-	protected ImageButton displayListButton;
+	//protected Button gpsButton;
+	//protected ImageButton searchButton;
+	//protected ImageButton displayListButton;
 	protected MapView mv;
 	protected MapController mapController;
 	protected SeekBar yearSeekBar;
@@ -58,21 +82,80 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	protected ArrayList<Map<String, String>>soilist;
 	protected int yearToSearch; 
 	protected TextView yearTextView;
+	protected RelativeLayout yearLayout;
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu){
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main_menu, menu);
+		return true;
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+		case R.id.get_location:
+			this.showCurrentLocation();
+			return true;
+		case R.id.listView:
+			this.displayListView();
+			return true;
+		case R.id.history_scoop:
+			yearLayout.setVisibility(View.VISIBLE);
+			AnimationSet animateSet = new AnimationSet(true);
+			Animation slideUp = new TranslateAnimation(
+	                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+	                0.0f, Animation.RELATIVE_TO_SELF, -1.0f,
+	                Animation.RELATIVE_TO_SELF, 0.0f);
+			slideUp.setDuration(600);
+			slideUp.setAnimationListener(new AnimationListener(){
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+			animateSet.addAnimation(slideUp);
+			LayoutAnimationController controller = new LayoutAnimationController(animateSet, 0.25f);
+			
+			this.yearLayout.startAnimation(slideUp);
+			
+			return true;
+		case R.id.setting:
+			this.login();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);	//³]©wlayout
+        yearLayout = (RelativeLayout)findViewById(R.id.yearLayout);
+        yearLayout.setVisibility(View.GONE);
         
         yearToSearch = 0;
         yearSeekBar = (SeekBar) findViewById(R.id.year_seekBar);
         yearSeekBar.setMax(2000);
-        
+        //yearSeekBar.setVisibility(View.GONE);
         yearSeekBar.setEnabled(false);
         yearTextView = (TextView) findViewById(R.id.year_TextView);
         
-        gpsButton = (Button) findViewById(R.id.retrieve_Location_Button);	//create button&View
-        searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
-        displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
+        //gpsButton = (Button) findViewById(R.id.retrieve_Location_Button);	//create button&View
+        //searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
+        //displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
         poiDrawer = (SlidingDrawer)findViewById(R.id.poiDrawer);
         poiDrawer.setVisibility(View.GONE);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -84,7 +167,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         myLocationOverlay = new MyLocationOverlay(this, this.mv);
         myLocationListener = new MyLocationListener();
         poiLoadTask = new POILoadTask();
-        gpsButton.setOnClickListener(new OnClickListener(){
+        /*gpsButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v) {
 	        		showCurrentLocation();
 			}
@@ -140,27 +223,11 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         });       
         displayListButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View v){
-        		Intent intent = new Intent();
-        		
-        		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        		if(location == null)
-        			location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        		
-        		if(location != null){//passing currentGeoData to ListView
-        			
-            		Bundle bundle = new Bundle();
-            		getList(location.getLatitude(),location.getLongitude());
-            		Log.d("data", soilist.toString());
-        			bundle.putSerializable("POI", soilist);
-        			intent.putExtras(bundle);
-        			//bundle.putDouble("CurrentLongitude", location.getLongitude());
-        			//bundle.putDouble("CurrentLatitude", location.getLatitude());
-        		}
-        		intent.setClass(getApplicationContext(), BrowseContentActivity.class);
-        		startActivity(intent);
+        		displayListView();
         		
         	}
         });
+        */
         yearSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
         	
         	Boolean isDrawed;
@@ -208,7 +275,6 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     		alert.show();
         }
         
-        this.login();
     }
     
     @Override
@@ -278,19 +344,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 					String snippets = (String) arg1.getSerializableExtra("POISnippet");
 					if(poiDrawer.getVisibility()==View.GONE){
 						//pop up animate still have bug
-						/*AnimationSet animateSet = new AnimationSet(true);
-						Animation slideUp = new TranslateAnimation(
-				                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-				                0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
-				                Animation.RELATIVE_TO_SELF, 1.0f);
-						slideUp.setDuration(600);
-						slideUp.setAnimationListener(new AnimationListener(){
-						});
-						animateSet.addAnimation(slideUp);
-						LayoutAnimationController controller = new LayoutAnimationController(animateSet, 0.25f);
 						
-						poiDrawer.startAnimation(slideUp);
-						*/
 						
 						poiDrawer.setVisibility(View.VISIBLE);
 					}
@@ -325,6 +379,27 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	}
     	
     }
+	
+	protected void displayListView(){
+		Intent intent = new Intent();
+		
+		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if(location == null)
+			location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		
+		if(location != null){//passing currentGeoData to ListView
+			
+    		Bundle bundle = new Bundle();
+    		getList(location.getLatitude(),location.getLongitude());
+    		Log.d("data", soilist.toString());
+			bundle.putSerializable("POI", soilist);
+			intent.putExtras(bundle);
+			//bundle.putDouble("CurrentLongitude", location.getLongitude());
+			//bundle.putDouble("CurrentLatitude", location.getLatitude());
+		}
+		intent.setClass(getApplicationContext(), BrowseContentActivity.class);
+		startActivity(intent);
+	}
 	POIItemizedOverlay oldpoiOverlay;
 	protected boolean drawOnMap(){
 		if(!soilist.isEmpty()){

@@ -1,0 +1,23 @@
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+		<item android:id="@+id/get_location"
+		    android:icon="@drawable/ic_action_locate"
+		    android:title="@string/retriveButton"
+		 	android:showAsAction="ifRoom|withText"
+		    ></item>
+		<item android:id="@+id/listView"
+		    android:icon ="@drawable/ic_action_list"
+		    android:title="ListView"
+		    android:showAsAction="ifRoom"
+		    ></item>
+		<item android:id="@+id/setting"
+		    android:icon = "@drawable/ic_action_settings"
+		    android:title="Setting"
+		    android:showAsAction="ifRoom|withText"
+		    ></item>
+		<item android:id="@+id/history_scoop"
+		    android:icon="@drawable/ic_action_time"
+		    android:title="@string/historytimeline"
+		    android:showAsAction = "ifRoom|withText"
+		    ></item>
+	</menu>
