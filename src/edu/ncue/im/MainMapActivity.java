@@ -148,7 +148,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         
         yearToSearch = 0;
         yearSeekBar = (SeekBar) findViewById(R.id.year_seekBar);
-        yearSeekBar.setMax(2000);
+        yearSeekBar.setMax(500);
         //yearSeekBar.setVisibility(View.GONE);
         yearSeekBar.setEnabled(false);
         yearTextView = (TextView) findViewById(R.id.year_TextView);
@@ -234,7 +234,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
-				yearToSearch = progress;
+				yearToSearch = progress+1500;
 				isDrawed = drawOnMap();
 				mv.invalidate();
 				yearTextView.setText(String.valueOf(yearToSearch));
@@ -409,7 +409,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 			}
 			for(Map<String, String> map : soilist){	//check every point are in the year
 				GeoPoint gp;
-				if(Integer.parseInt(map.get("POI_YEAR"))>=this.yearToSearch){
+				if(Integer.parseInt(map.get("POI_YEAR"))<=this.yearToSearch){
 					gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
 					OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
 					poiOverlay.addOverlay(poi);
@@ -454,7 +454,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 		}
 		
 		float distance = currentLocation.distanceTo(oldLocation);
-		if (distance > 250) {
+		if (distance > 100) {
 				poiLoadTask = new POILoadTask();
 				poiLoadTask.execute(latitude, longitude);
 				try {

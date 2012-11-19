@@ -64,7 +64,7 @@ public class ContentDetailActivity extends Activity {
 		
 		final HashMap<String, String> poiMap = (HashMap<String, String>)this.getIntent().getSerializableExtra("SinglePOI");
 		im = (ImageView)findViewById(R.id.titleImageView);
-		im.setImageResource(R.drawable.place_holder1);
+		im.setImageResource(R.drawable.placeholder_history);
 
 		
 		if (poiMap.get("PICsURL") != null) {

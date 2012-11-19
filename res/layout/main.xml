@@ -84,7 +84,7 @@
     android:layout_alignBottom="@+id/year_seekBar"
     android:layout_alignParentRight="true"
     android:layout_alignTop="@+id/year_seekBar"
-    android:text="TextView"
+    android:text="@string/historytimeline"
     />
 </RelativeLayout>
 </RelativeLayout>

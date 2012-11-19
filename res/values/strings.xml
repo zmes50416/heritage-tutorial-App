@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	
-	<string name="app_name">DEPProject</string>
+	<string name="app_name">時空膠捲</string>
     <string name="googleMap_API">0mP_T2GuPlWvlLuDJl1O4mKycdielHLwt-mvzQA</string>
     <string name="retriveButton">定位現在所在位址</string>
 	<string name="historytimeline">歷史時間軸</string>
