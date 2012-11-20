@@ -15,7 +15,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -34,15 +33,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationSet;
 import android.view.animation.LayoutAnimationController;
 import android.view.animation.TranslateAnimation;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -72,7 +67,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	//protected Button gpsButton;
 	//protected ImageButton searchButton;
 	//protected ImageButton displayListButton;
-	protected MapView mv;
+	protected MyMapView mv;
 	protected MapController mapController;
 	protected SeekBar yearSeekBar;
 	protected static MyLocationListener myLocationListener;
@@ -83,6 +78,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	protected int yearToSearch; 
 	protected TextView yearTextView;
 	protected RelativeLayout yearLayout;
+	protected View popView;
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
 		MenuInflater inflater = getMenuInflater();
@@ -110,19 +106,16 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					// TODO Auto-generated method stub
 					
 				}
 
 				@Override
 				public void onAnimationRepeat(Animation animation) {
-					// TODO Auto-generated method stub
 					
 				}
 
 				@Override
 				public void onAnimationStart(Animation animation) {
-					// TODO Auto-generated method stub
 					
 				}
 			});
@@ -143,6 +136,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);	//³]©wlayout
+        
         yearLayout = (RelativeLayout)findViewById(R.id.yearLayout);
         yearLayout.setVisibility(View.GONE);
         
@@ -153,81 +147,41 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         yearSeekBar.setEnabled(false);
         yearTextView = (TextView) findViewById(R.id.year_TextView);
         
-        //gpsButton = (Button) findViewById(R.id.retrieve_Location_Button);	//create button&View
-        //searchButton = (ImageButton) findViewById(R.id.pop_keyboard_Button);
-        //displayListButton = (ImageButton)findViewById(R.id.display_list_Button);
+
         poiDrawer = (SlidingDrawer)findViewById(R.id.poiDrawer);
         poiDrawer.setVisibility(View.GONE);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         soilist = new ArrayList<Map<String, String>>();
-        mv = (MapView) findViewById(R.id.mapview);
+        mv = (MyMapView) findViewById(R.id.mapview);
+        
         mv.setBuiltInZoomControls(false);	//disable the zoom button
         mapController = mv.getController();
         myLocationOverlay = new MyLocationOverlay(this, this.mv);
         myLocationListener = new MyLocationListener();
         poiLoadTask = new POILoadTask();
-        /*gpsButton.setOnClickListener(new OnClickListener(){
-        	public void onClick(View v) {
-	        		showCurrentLocation();
-			}
-        });
-        searchButton.setOnClickListener(new OnClickListener(){
-        	public void onClick(View v){
-        		final EditText input = new EditText(v.getContext());
-                final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-        		
-                alert.setView(input);
-        		alert.setPositiveButton("Search", new DialogInterface.OnClickListener(){
-					public void onClick(DialogInterface dialog, int which) {
-
-						Boolean findFlag = false;
-						//Editable value = input.getText();
-						Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-						if(location != null){
-							//new foundList to save the result
-							ArrayList<Map<String, String>> foundList = new ArrayList<Map<String, String>>();
-							for(Map<String, String> m:soilist){
-								String name = m.get("POI_title");
-								if(name.contains(input.getText())){
-									foundList.add(m);
-									findFlag = true;
-								}		
-							}
-							if(findFlag == true){
-								Intent intent = new Intent();
-								Bundle searchBundle = new Bundle();
-								searchBundle.putSerializable("POI", foundList);
-								intent.putExtras(searchBundle);
-								intent.setClass(getApplicationContext(), BrowseContentActivity.class);
-								startActivity(intent);
-							}
-							if(findFlag == false){
-								Toast.makeText(getApplicationContext(), "Can't Find Any Point contains "+input.getText(), Toast.LENGTH_SHORT).show();
-							}
-						}
-							
-						
-						
-					}
-        		});
-        		alert.setNegativeButton("Cancle",new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						//cancel search
+        final POIItemizedOverlay myOverlay = new POIItemizedOverlay(this.getResources().getDrawable(R.drawable.map_arrow), this);
+        mv.setOnLongpressListener(new MyMapView.OnLongpressListener() {
+			
+			@Override
+			public void onLongpress(MapView view, final GeoPoint longpressLocation) {
+				runOnUiThread(new Runnable(){
+					public void run(){
+						myOverlay.clear();
+						OverlayItem overlayItem = new OverlayItem(longpressLocation, "«ü©w¦ì§}","Press here to find");
+						myOverlay.addOverlay(overlayItem);
+			    		mv.getOverlays().add(myOverlay);
+			    		mv.invalidate();
 					}
 				});
-        		
-        		alert.show();
-        		//keyboard.toggleSoftInput(softInputAnchor, 0)
-        	}
-        });       
-        displayListButton.setOnClickListener(new OnClickListener(){
-        	public void onClick(View v){
-        		displayListView();
-        		
-        	}
-        });
-        */
+				
+			}
+		});
+        
+        popView = super.getLayoutInflater().inflate(R.layout.overlay_pop, null);
+        mv.addView(popView, new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT, null, MapView.LayoutParams.BOTTOM_CENTER));
+        popView.setVisibility(View.GONE);
+
         yearSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
         	
         	Boolean isDrawed;
@@ -306,7 +260,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     {
     	return false;
     }
-    
+
 	protected void showCurrentLocation(){
     	Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     	if (location == null){
@@ -400,8 +354,9 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 		intent.setClass(getApplicationContext(), BrowseContentActivity.class);
 		startActivity(intent);
 	}
+	
 	POIItemizedOverlay oldpoiOverlay;
-	protected boolean drawOnMap(){
+	protected boolean drawOnMap(){ //if draw new poi is needed then return true otherwise just return false
 		if(!soilist.isEmpty()){
 			POIItemizedOverlay poiOverlay = new POIItemizedOverlay(this.getResources().getDrawable(R.drawable.poi), this);
 			if(oldpoiOverlay != null){

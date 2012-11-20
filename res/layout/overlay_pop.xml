@@ -1,0 +1,33 @@
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+     android:background="@drawable/info_bubble"   
+     android:layout_width="wrap_content"   
+     android:layout_height="wrap_content"  
+     android:paddingLeft="5dp"  
+     android:paddingTop="5dp"  
+     android:paddingRight="5dp"  
+     android:paddingBottom="20dp"      
+       >  
+         
+        <TextView android:id="@+id/map_bubbleTitle"   
+           android:ellipsize="marquee"   
+           android:layout_width="120dp"   
+           android:layout_height="wrap_content"  
+           android:gravity="center_horizontal"  
+           android:singleLine="true"   />  
+                                      
+        <TextView
+            android:id="@+id/map_bubbleText"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/map_bubbleImage"
+            android:singleLine="false" />
+
+        <ImageView
+            android:id="@+id/map_bubbleImage"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/map_bubbleText"
+            android:layout_alignTop="@+id/map_bubbleTitle"
+            android:background="@drawable/close" />
+          
+    </RelativeLayout>  
