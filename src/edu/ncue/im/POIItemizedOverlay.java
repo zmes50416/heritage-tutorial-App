@@ -56,10 +56,11 @@ public class POIItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 			paintCircle.setColor(Color.RED);
 			canvas.drawCircle(point.x, point.y, 5, paintCircle);
 
-			Paint paintText = new Paint();
+			/*Paint paintText = new Paint();
 			paintText.setColor(Color.BLACK);
 			paintText.setTextSize(15);
-			canvas.drawText(title, point.x, point.y - 25, paintText); 
+			canvas.drawText(title, point.x, point.y - 25, paintText);
+			*/ 
 
 		}
 

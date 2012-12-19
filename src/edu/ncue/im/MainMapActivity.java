@@ -168,8 +168,13 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 				runOnUiThread(new Runnable(){
 					public void run(){
 						myOverlay.clear();
-						OverlayItem overlayItem = new OverlayItem(longpressLocation, "指定位址","Press here to find");
+						OverlayItem overlayItem = new OverlayItem(longpressLocation, "指定位址"," ");
+						
 						myOverlay.addOverlay(overlayItem);
+						getList(longpressLocation.getLatitudeE6() / 1E6, longpressLocation.getLongitudeE6() / 1E6);
+						if(drawOnMap()!= true)
+			    			Toast.makeText(getApplication(),"無符合年代以上之景點",Toast.LENGTH_LONG).show();
+			    		yearSeekBar.setEnabled(true);
 			    		mv.getOverlays().add(myOverlay);
 			    		mv.invalidate();
 					}
@@ -377,7 +382,8 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			}
 			else 
 				return false;
-		}else{
+		}
+		else{
 			return false;
 		}
 		
