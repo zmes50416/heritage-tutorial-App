@@ -1,2 +1,4 @@
 /bin
 /lint.xml
+/gen
+.DS_Store

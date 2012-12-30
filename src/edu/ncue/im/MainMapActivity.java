@@ -405,6 +405,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			try {
 				soilist = this.poiLoadTask.get();
 			} catch (InterruptedException e) {
+				Toast.makeText(MainMapActivity.this, "資料格式不符發生問題", Toast.LENGTH_SHORT);
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 				e.printStackTrace();
@@ -500,9 +501,29 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			try{
 				formatted_result = this.sentHttpRequest(request_URL);
 				soilist = parseJson(formatted_result);
-			}catch(Exception e){
+			}catch(JSONException e){
+				runOnUiThread(new Runnable(){
+					@Override
+					public void run() {
+						Toast.makeText(MainMapActivity.this, "資料規格發生問題", Toast.LENGTH_SHORT).show();
+						
+					}
+					
+				});
 				e.printStackTrace();
 			}
+			catch(Exception e){
+				runOnUiThread(new Runnable(){
+					@Override
+					public void run() {
+						Toast.makeText(MainMapActivity.this, "伺服器發生問題", Toast.LENGTH_SHORT).show();
+						
+					}
+					
+				});
+				e.printStackTrace();
+			}
+			
 			
 			return this.getsoilist();
 			
@@ -586,7 +607,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 				String result = sb.toString();
 				return result;
 			}catch(Exception e){
-				
+				Toast.makeText(MainMapActivity.this, "伺服器發生問題", Toast.LENGTH_SHORT).show();
 				e.getMessage();
 				e.printStackTrace();
 				

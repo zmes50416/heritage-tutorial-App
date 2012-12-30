@@ -5,4 +5,5 @@
     <string name="googleMap_API">0mP_T2GuPlWvlLuDJl1O4mKycdielHLwt-mvzQA</string>
     <string name="retriveButton">定位現在所在位址</string>
 	<string name="historytimeline">歷史時間軸</string>
+	<string name="distance_spinner_prompt">按此選取搜尋距離（預設：中）</string>
 </resources>

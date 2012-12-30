@@ -58,9 +58,41 @@ public class SettingsActivity extends Activity {
 		 
 		 ActionBar actionBar = getActionBar();
 		 actionBar.setDisplayHomeAsUpEnabled(true);
+		 
+		 Spinner spinner = (Spinner) findViewById(R.id.distance_spinner);
+		 //建立一個ArrayAdapter物件，並放置下拉選單的內容
+		 ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,new String[]{"近","中","遠"});
+		 //設定下拉選單的樣式
+		 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		 spinner.setAdapter(adapter);
+		 //設定項目被選取之後的動作
+		 spinner.setSelection(1);
+		 spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+		 public void onItemSelected(AdapterView adapterView, View view, int position, long id){
+			 				switch(adapterView.getSelectedItemPosition()){
+			 				case 0:
+			 					MainMapActivity.DISTANCE_TO_SEARCH = 300;
+			 					break;
+			 				case 1:
+			 					MainMapActivity.DISTANCE_TO_SEARCH = 1000;
+			 					break;
+			 				case 2:
+			 					MainMapActivity.DISTANCE_TO_SEARCH = 3000;
+			 					break;
+			 				}
+		 }
+
+		@Override
+		public void onNothingSelected(AdapterView<?> arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		 });
+		 
 		 userName = (TextView)findViewById(R.id.userNameTextView);
 		 Button logoutButton = (Button)findViewById(R.id.facebookLogOutButton);
 		 userPicView = (ImageView)findViewById(R.id.userPictureImageView);
+		 
 		 mPrefs = this.getPreferences(MODE_PRIVATE);
 		 String access_token = mPrefs.getString("access_token", null);
 		 long expires = mPrefs.getLong("access_expires", 0);
@@ -116,7 +148,7 @@ public class SettingsActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				finish();
+				
 				
 			}
 			
