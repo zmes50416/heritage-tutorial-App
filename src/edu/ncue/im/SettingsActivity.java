@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ActionBar;
@@ -21,23 +19,36 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.facebook.android.*;
+import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.AsyncFacebookRunner.RequestListener;
-import com.facebook.android.Facebook.*;
+import com.facebook.android.DialogError;
+import com.facebook.android.Facebook;
+import com.facebook.android.Facebook.DialogListener;
+import com.facebook.android.FacebookError;
+
 import edu.ncue.test.jls.R;
 
-public class SettingsActivity extends Activity {
 
+public class SettingsActivity extends Activity {
+	
 	public static final String APP_ID = "273315202770124";
 	String[] permissions = { "publish_stream", "offline_access"};
+	
 	private String name;
 	private String imageURL;
 	TextView userName;
 	ImageView userPicView;
 	public static Facebook facebook = new Facebook(APP_ID);
 	private SharedPreferences mPrefs;
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
@@ -51,11 +62,14 @@ public class SettingsActivity extends Activity {
 		}
 		
 	}
-	 @Override
+	 
+	@Override
 	 public void onCreate(Bundle savedInstanceState) {
 		 super.onCreate(savedInstanceState);
 		 setContentView(R.layout.settings);
-		 
+
+	       
+		    
 		 ActionBar actionBar = getActionBar();
 		 actionBar.setDisplayHomeAsUpEnabled(true);
 		 
@@ -144,11 +158,13 @@ public class SettingsActivity extends Activity {
 		Bundle params = new Bundle();
 		params.putString("fields","picture.type(large),name");
         as.request("me", params, new UserReuestListener());
+        
+	    
 		logoutButton.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				
+				login();
 				
 			}
 			
@@ -156,13 +172,15 @@ public class SettingsActivity extends Activity {
 		
 		 
 	}
-	 
+	
+	private void login(){
+		startActivity(new Intent().setClass(getApplicationContext(), FBSettingActivity.class));
+	}
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		super.onActivityResult(requestCode, resultCode, data);
 		facebook.authorizeCallback(requestCode, resultCode, data);
 	}
-	
 	Bitmap bitmap;
 	class UserReuestListener implements RequestListener{
 
@@ -229,5 +247,6 @@ public class SettingsActivity extends Activity {
 		}
  	
  }
+	
 	
 }
