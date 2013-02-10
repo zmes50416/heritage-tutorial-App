@@ -2,3 +2,5 @@
 /lint.xml
 /gen
 .DS_Store
+
+project.properties
