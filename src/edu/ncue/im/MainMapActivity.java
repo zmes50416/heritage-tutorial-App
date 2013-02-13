@@ -128,6 +128,9 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 		case R.id.setting:
 			this.login();
 			return true;
+		case R.id.nfc_passport:
+			this.nfc();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -391,6 +394,10 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	//Facebook Login
 	protected void login(){
 		startActivity(new Intent().setClass(getApplicationContext(), SettingsActivity.class));
+	}
+	//NFCPassPort
+	protected void nfc(){
+		startActivity(new Intent().setClass(getApplicationContext(), NfcPushInActivity.class));
 	}
 	Location oldLocation;
 	public ArrayList<Map<String, String>> getList(double latitude, double longitude){

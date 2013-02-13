@@ -36,6 +36,7 @@
         <activity android:name="edu.ncue.im.ContentDetailActivity"></activity>
         <activity android:name="edu.ncue.im.SettingsActivity"></activity>
         <activity android:name="edu.ncue.im.FBSettingActivity"></activity>
+        <activity android:name="edu.ncue.im.NfcPushInActivity"></activity>
     </application>
     
 
