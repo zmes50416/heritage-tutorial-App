@@ -79,12 +79,14 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 	protected TextView yearTextView;
 	protected RelativeLayout yearLayout;
 	protected View popView;
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
@@ -135,7 +137,8 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			return super.onOptionsItemSelected(item);
 		}
 	}
-    @Override
+    
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);	//設定layout
@@ -209,7 +212,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				if(isDrawed == false)
-					Toast.makeText(getApplication(),"已無符合年代以上之景點",Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplication(),"已無符合年代以上之景點",Toast.LENGTH_SHORT).show();
 			}
         	
         });
@@ -352,9 +355,11 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 		if(location != null){//passing currentGeoData to ListView
 			
     		Bundle bundle = new Bundle();
-    		getList(location.getLatitude(),location.getLongitude());
-    		Log.d("data", soilist.toString());
-			bundle.putSerializable("POI", soilist);
+    		if(soilist == null){
+    			getList(location.getLatitude(),location.getLongitude());
+    			Log.d("data", soilist.toString());
+    			}
+    		bundle.putSerializable("POI", soilist);
 			intent.putExtras(bundle);
 			//bundle.putDouble("CurrentLongitude", location.getLongitude());
 			//bundle.putDouble("CurrentLatitude", location.getLatitude());
@@ -391,15 +396,18 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 		}
 		
 	}
+	
 	//Facebook Login
 	protected void login(){
 		startActivity(new Intent().setClass(getApplicationContext(), SettingsActivity.class));
 	}
+	
 	//NFCPassPort
 	protected void nfc(){
-		startActivity(new Intent().setClass(getApplicationContext(), NfcPushInActivity.class));
+		startActivity(new Intent().setClass(getApplicationContext(), NfcPassportActivity.class));
 	}
 	Location oldLocation;
+	
 	public ArrayList<Map<String, String>> getList(double latitude, double longitude){
 		Location currentLocation = new Location("currentLocation");
 		

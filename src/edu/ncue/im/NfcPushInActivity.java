@@ -1,11 +1,19 @@
 package edu.ncue.im;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import edu.ncue.test.jls.R;
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.nfc.*;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NfcF;
@@ -23,10 +31,12 @@ public class NfcPushInActivity extends Activity {
     private String[][] mTechLists;
     private TextView testTV;
     private String mText; 
+    private DataBaseHelper mDatabaseHelper;
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
 		case android.R.id.home:
+			
 			finish();
 			return true;
 		default:
@@ -40,7 +50,21 @@ public class NfcPushInActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.nfcpushin);
 		testTV = (TextView) this.findViewById(R.id.testContentTextView);
+		
+		mDatabaseHelper = new DataBaseHelper(this);
+		try{
+			mDatabaseHelper.createDataBase(); 
+		}catch(IOException ioe){
+			throw new Error("Unable to create database");
+		}
+		try{
+			mDatabaseHelper.openDataBase();
+		}catch(SQLException sqle){
+			throw sqle;
+		}
+		
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+		
 		if(mNfcAdapter == null){	//check nfcfunction is there or not
 			Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
 			finish();
@@ -72,6 +96,7 @@ public class NfcPushInActivity extends Activity {
     public void onPause() {
         super.onPause();
         if (mNfcAdapter != null) mNfcAdapter.disableForegroundDispatch(this);
+        this.mDatabaseHelper.close();
     }
     
     @Override
@@ -79,6 +104,7 @@ public class NfcPushInActivity extends Activity {
         super.onResume();
         if (mNfcAdapter != null) mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mFilters,
                 mTechLists);
+        
     }
     
     //NFC Tag data come in onNewIntent
@@ -87,7 +113,7 @@ public class NfcPushInActivity extends Activity {
         Log.i("Foreground dispatch", "Discovered tag with intent: " + intent);
         mText= "Tag not found";
         processIntent(intent);
-        this.testTV.setText("content:"+ mText);
+        
     }
     
     //process Tag
@@ -108,9 +134,36 @@ public class NfcPushInActivity extends Activity {
         Log.d("NFC","record Length:"+len);
         for(int i = 0;i<len;i++){
         	 NfcTextRecord nfcTextRecord = NfcTextRecord.parse(ndefRecords[i]);
-        	Toast.makeText(this, nfcTextRecord.getText(), Toast.LENGTH_SHORT);
-        	mText = nfcTextRecord.getText();
+        	 mText = nfcTextRecord.getText();
         }
+        	this.mDatabaseHelper.openDataBase();
+        	Cursor c = this.mDatabaseHelper.getOne(Integer.parseInt(mText));
+        	if(c.getCount() == 1){
+        		c.moveToFirst();
+        		int itemID = c.getInt(c.getColumnIndexOrThrow("_id"));
+        		String title = c.getString(c.getColumnIndexOrThrow("title"));
+        		SharedPreferences sharedList = this.getSharedPreferences("edu.ncue.im.NFCPassport", Context.MODE_PRIVATE);
+        		HashSet<String> idSet;
+        		if(sharedList.getStringSet("passIDSet", null) != null)
+        			idSet = new HashSet<String>(sharedList.getStringSet("passIDSet", null));
+        		else
+        			idSet = new HashSet<String>();
+        		
+        		if(!idSet.add(Integer.toString(itemID))){
+        			Toast.makeText(this, "已註冊過!", Toast.LENGTH_SHORT).show();
+        		}
+        		SharedPreferences.Editor editor = sharedList.edit();
+        		editor.putStringSet("passIDSet", idSet);
+        		editor.commit();
+        		testTV.setText("戳章註冊！第"+itemID+"戳章："+title);
+        	}
+        	else
+        		testTV.setText("非正確的標籤");
+        	
+        	
+        
     }	
+    
+    
 
 }
