@@ -34,14 +34,17 @@ public class NfcPassportActivity extends Activity {
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()){
-		case android.R.id.home:
-			finish();
+		int id = item.getItemId();
+		if(id == android.R.id.home){
+			Intent intent = new Intent(this, MainMapActivity.class);
+			this.startActivity(intent);
 			return true;
-		case R.id.pushIn:
+		}
+		else if(id == R.id.pushIn){
 			this.enterPushIn();
 			return true;
-		default:
+		}
+		else{
 			return super.onOptionsItemSelected(item);
 		}
 		

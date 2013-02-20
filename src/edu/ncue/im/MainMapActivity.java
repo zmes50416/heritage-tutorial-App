@@ -89,51 +89,28 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-		case R.id.get_location:
+		int id = item.getItemId();
+		if(id == R.id.get_location){
 			this.showCurrentLocation();
 			return true;
-		case R.id.listView:
+		}
+		else if(id == R.id.listView){
 			this.displayListView();
 			return true;
-		case R.id.history_scoop:
-			yearLayout.setVisibility(View.VISIBLE);
-			AnimationSet animateSet = new AnimationSet(true);
-			Animation slideUp = new TranslateAnimation(
-	                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-	                0.0f, Animation.RELATIVE_TO_SELF, -1.0f,
-	                Animation.RELATIVE_TO_SELF, 0.0f);
-			slideUp.setDuration(600);
-			slideUp.setAnimationListener(new AnimationListener(){
-
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					
-				}
-
-				@Override
-				public void onAnimationRepeat(Animation animation) {
-					
-				}
-
-				@Override
-				public void onAnimationStart(Animation animation) {
-					
-				}
-			});
-			animateSet.addAnimation(slideUp);
-			LayoutAnimationController controller = new LayoutAnimationController(animateSet, 0.25f);
-			
-			this.yearLayout.startAnimation(slideUp);
-			
+		}
+		else if(id == R.id.history_scoop){
+			this.showHistoryScoop();
 			return true;
-		case R.id.setting:
+		}
+		else if(id == R.id.setting){
 			this.login();
 			return true;
-		case R.id.nfc_passport:
+		}
+		else if(id == R.id.nfc_passport){
 			this.nfc();
 			return true;
-		default:
+		}
+		else{
 			return super.onOptionsItemSelected(item);
 		}
 	}
@@ -179,7 +156,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 						myOverlay.addOverlay(overlayItem);
 						getList(longpressLocation.getLatitudeE6() / 1E6, longpressLocation.getLongitudeE6() / 1E6);
 						if(drawOnMap()!= true)
-			    			Toast.makeText(getApplication(),"無符合年代以上之景點",Toast.LENGTH_LONG).show();
+			    			Toast.makeText(getApplication(),"無符合年代以上之景點",Toast.LENGTH_SHORT).show();
 			    		yearSeekBar.setEnabled(true);
 			    		mv.getOverlays().add(myOverlay);
 			    		mv.invalidate();
@@ -272,6 +249,36 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     	return false;
     }
 
+    protected void showHistoryScoop(){
+    	yearLayout.setVisibility(View.VISIBLE);
+		AnimationSet animateSet = new AnimationSet(true);
+		Animation slideUp = new TranslateAnimation(
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.0f, Animation.RELATIVE_TO_SELF, -1.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f);
+		slideUp.setDuration(600);
+		slideUp.setAnimationListener(new AnimationListener(){
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				
+			}
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				
+			}
+		});
+		animateSet.addAnimation(slideUp);
+		LayoutAnimationController controller = new LayoutAnimationController(animateSet, 0.25f);
+		
+		this.yearLayout.startAnimation(slideUp);
+    }
 	protected void showCurrentLocation(){
     	Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     	if (location == null){

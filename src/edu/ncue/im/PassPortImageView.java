@@ -30,7 +30,7 @@ public class PassPortImageView extends ImageView {
 	//check ID have been recorded or not
 	public void checkID(){
 		
-		pic = this.getResources().getIdentifier("edu.ncue.test.jls:drawable/question_mark", null, null);
+		pic = this.getResources().getIdentifier("edu.ncue.test.jls:drawable/uncover", null, null);
 		
 		HashSet<String> a = (HashSet<String>) sharedList.getStringSet("passIDSet", null);
 		if(a != null){

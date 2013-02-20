@@ -8,12 +8,14 @@
         android:id="@+id/nfcWelcomeMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="請將手機輕壓在正確的NFC標籤上以讀取資訊" />
+        android:text="請將手機輕壓在正確的NFC標籤上以讀取資訊"
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/testContentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="waiting..." />
+        android:text="waiting..."
+        android:textSize="24sp" />
 
 </LinearLayout>

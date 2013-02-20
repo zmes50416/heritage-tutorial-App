@@ -19,6 +19,7 @@ import android.nfc.tech.Ndef;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,8 +37,9 @@ public class NfcPushInActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
 		case android.R.id.home:
-			
-			finish();
+			//back to before page and restart it.
+			Intent intent = new Intent(this, NfcPassportActivity.class);
+			startActivity(intent);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -150,7 +152,9 @@ public class NfcPushInActivity extends Activity {
         			idSet = new HashSet<String>();
         		
         		if(!idSet.add(Integer.toString(itemID))){
-        			Toast.makeText(this, "已註冊過!", Toast.LENGTH_SHORT).show();
+        			Toast t = Toast.makeText(this, "已註冊過!", Toast.LENGTH_SHORT);
+        			t.setGravity(Gravity.CENTER, 0, 0);
+        			t.show();
         		}
         		SharedPreferences.Editor editor = sharedList.edit();
         		editor.putStringSet("passIDSet", idSet);
