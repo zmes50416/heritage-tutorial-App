@@ -38,7 +38,7 @@ public class ContentDetailActivity extends Activity {
 	protected ScrollView sV;
 	protected Button likeButton;
 	protected Bitmap bitmap;
-	private Facebook facebook = SettingsActivity.facebook;
+	//private Facebook facebook = SettingsActivity.facebook;
 	String test;
 	
 	@Override
@@ -105,7 +105,7 @@ public class ContentDetailActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if(facebook.isSessionValid()){
+				/*if(facebook.isSessionValid()){
 					test ="failed";
 					
 					AsyncFacebookRunner as = new AsyncFacebookRunner(facebook);
@@ -136,7 +136,7 @@ public class ContentDetailActivity extends Activity {
 							
 					
 					
-				}
+				}*/
 			}
 		});
 			

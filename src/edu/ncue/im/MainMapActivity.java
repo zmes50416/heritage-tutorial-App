@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -119,6 +120,22 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);	//³]©wlayout
+        SharedPreferences mPrefs = this.getSharedPreferences("edu.ncue.im.DistanceSetting", Context.MODE_PRIVATE);
+        switch(mPrefs.getInt("distanceSetting", 1)){
+        case 0:
+        	DISTANCE_TO_SEARCH = 500;
+        	break;
+        case 1:
+        	DISTANCE_TO_SEARCH = 1000;
+        	break;
+        case 2:
+        	DISTANCE_TO_SEARCH = 1500;
+        	break;
+        default:
+        	DISTANCE_TO_SEARCH = 1000;
+        	break;
+        }
+        
         
         yearLayout = (RelativeLayout)findViewById(R.id.yearLayout);
         yearLayout.setVisibility(View.GONE);
@@ -289,7 +306,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
     	{ 			
     		
     		GeoPoint currentPoint = new GeoPoint((int)(location.getLatitude()*1E6),(int)(location.getLongitude()*1E6));
-    		Toast.makeText(MainMapActivity.this,"Current Location \n Longitude: "+currentPoint.getLongitudeE6()+"\n Latitude: "+currentPoint.getLatitudeE6(), Toast.LENGTH_LONG).show();
+    		//Toast.makeText(MainMapActivity.this,"Current Location \n Longitude: "+currentPoint.getLongitudeE6()+"\n Latitude: "+currentPoint.getLatitudeE6(), Toast.LENGTH_LONG).show();
     		//retrieve GPS data and zoom to that position
     		mapController.animateTo(currentPoint);
     		mapController.setZoom(16);

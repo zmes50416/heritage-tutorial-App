@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -46,7 +47,7 @@ public class SettingsActivity extends Activity {
 	private String imageURL;
 	TextView userName;
 	ImageView userPicView;
-	public static Facebook facebook = new Facebook(APP_ID);
+	//public static Facebook facebook = new Facebook(APP_ID);
 	private SharedPreferences mPrefs;
 	
 	@Override
@@ -80,20 +81,27 @@ public class SettingsActivity extends Activity {
 		 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		 spinner.setAdapter(adapter);
 		 //設定項目被選取之後的動作
-		 spinner.setSelection(1);
+		 mPrefs = this.getSharedPreferences("edu.ncue.im.DistanceSetting", Context.MODE_PRIVATE);
+		 int distanceSetting = mPrefs.getInt("distanceSetting", 1);
+		 spinner.setSelection(distanceSetting);
+		 
+		 
 		 spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
 		 public void onItemSelected(AdapterView adapterView, View view, int position, long id){
-			 				switch(adapterView.getSelectedItemPosition()){
+			 SharedPreferences.Editor editor = mPrefs.edit();
+			 
+			 switch(adapterView.getSelectedItemPosition()){				
 			 				case 0:
-			 					MainMapActivity.DISTANCE_TO_SEARCH = 300;
+			 					editor.putInt("distanceSetting", 0);
 			 					break;
 			 				case 1:
-			 					MainMapActivity.DISTANCE_TO_SEARCH = 1000;
+			 					editor.putInt("distanceSetting", 1);
 			 					break;
 			 				case 2:
-			 					MainMapActivity.DISTANCE_TO_SEARCH = 3000;
+			 					editor.putInt("distanceSetting", 2);
 			 					break;
 			 				}
+			 editor.commit();
 		 }
 
 		@Override
@@ -107,11 +115,12 @@ public class SettingsActivity extends Activity {
 		 Button logoutButton = (Button)findViewById(R.id.facebookLogOutButton);
 		 userPicView = (ImageView)findViewById(R.id.userPictureImageView);
 		 
-		 mPrefs = this.getPreferences(MODE_PRIVATE);
+		 /*mPrefs = this.getPreferences(MODE_PRIVATE);
 		 String access_token = mPrefs.getString("access_token", null);
 		 long expires = mPrefs.getLong("access_expires", 0);
+		 */
 		 // still have bug when u log out fb app and we still holding the old token.
-		 if(access_token != null){
+		 /*if(access_token != null){
 			 facebook.setAccessToken(access_token);
 		 }
 		 if(expires != 0){
@@ -158,13 +167,13 @@ public class SettingsActivity extends Activity {
 		Bundle params = new Bundle();
 		params.putString("fields","picture.type(large),name");
         as.request("me", params, new UserReuestListener());
-        
+        */
 	    
 		logoutButton.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				login();
+				//login();
 				
 			}
 			
@@ -174,12 +183,12 @@ public class SettingsActivity extends Activity {
 	}
 	
 	private void login(){
-		startActivity(new Intent().setClass(getApplicationContext(), FBSettingActivity.class));
+		//startActivity(new Intent().setClass(getApplicationContext(), FBSettingActivity.class));
 	}
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		super.onActivityResult(requestCode, resultCode, data);
-		facebook.authorizeCallback(requestCode, resultCode, data);
+		//facebook.authorizeCallback(requestCode, resultCode, data);
 	}
 	Bitmap bitmap;
 	class UserReuestListener implements RequestListener{
