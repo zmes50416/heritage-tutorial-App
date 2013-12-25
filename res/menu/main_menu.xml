@@ -15,11 +15,6 @@
 		    android:title="Setting"
 		    android:showAsAction="ifRoom|withText"
 		    ></item>
-		<item android:id="@+id/history_scoop"
-		    android:icon="@drawable/ic_action_time"
-		    android:title="@string/historytimeline"
-		    android:showAsAction = "ifRoom|withText"
-		    ></item>
 		<item android:id="@+id/nfc_passport"
 		    android:icon="@drawable/ic_action_time"
 		    android:title="@string/nfc_passport"

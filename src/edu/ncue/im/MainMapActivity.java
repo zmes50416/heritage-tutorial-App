@@ -70,15 +70,11 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 	//protected ImageButton displayListButton;
 	protected MyMapView mv;
 	protected MapController mapController;
-	protected SeekBar yearSeekBar;
 	protected static MyLocationListener myLocationListener;
 	protected MyLocationOverlay myLocationOverlay;
 	protected SlidingDrawer poiDrawer;
 	protected POILoadTask poiLoadTask;
 	protected ArrayList<Map<String, String>>soilist;
-	protected int yearToSearch; 
-	protected TextView yearTextView;
-	protected RelativeLayout yearLayout;
 	protected View popView;
 	
 	@Override
@@ -99,10 +95,12 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			this.displayListView();
 			return true;
 		}
+		/*
 		else if(id == R.id.history_scoop){
 			this.showHistoryScoop();
 			return true;
 		}
+		*/
 		else if(id == R.id.setting){
 			this.login();
 			return true;
@@ -136,17 +134,6 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
         	break;
         }
         
-        
-        yearLayout = (RelativeLayout)findViewById(R.id.yearLayout);
-        yearLayout.setVisibility(View.GONE);
-        
-        yearToSearch = 0;
-        yearSeekBar = (SeekBar) findViewById(R.id.year_seekBar);
-        yearSeekBar.setMax(500);
-        //yearSeekBar.setVisibility(View.GONE);
-        yearSeekBar.setEnabled(false);
-        yearTextView = (TextView) findViewById(R.id.year_TextView);
-        
 
         poiDrawer = (SlidingDrawer)findViewById(R.id.poiDrawer);
         poiDrawer.setVisibility(View.GONE);
@@ -174,7 +161,6 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 						getList(longpressLocation.getLatitudeE6() / 1E6, longpressLocation.getLongitudeE6() / 1E6);
 						if(drawOnMap()!= true)
 			    			Toast.makeText(getApplication(),"無符合年代以上之景點",Toast.LENGTH_SHORT).show();
-			    		yearSeekBar.setEnabled(true);
 			    		mv.getOverlays().add(myOverlay);
 			    		mv.invalidate();
 					}
@@ -187,29 +173,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
         mv.addView(popView, new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT, null, MapView.LayoutParams.BOTTOM_CENTER));
         popView.setVisibility(View.GONE);
 
-        yearSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
-        	
-        	Boolean isDrawed;
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {
-				yearToSearch = progress+1500;
-				isDrawed = drawOnMap();
-				mv.invalidate();
-				yearTextView.setText(String.valueOf(yearToSearch));
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				if(isDrawed == false)
-					Toast.makeText(getApplication(),"已無符合年代以上之景點",Toast.LENGTH_SHORT).show();
-			}
-        	
-        });
+        
         if(!locationEnabled){
         	AlertDialog.Builder builder = new AlertDialog.Builder(MainMapActivity.this);
     		builder.setMessage("GPS功能關閉中，是否前往設定開啟?")
@@ -266,36 +230,6 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     	return false;
     }
 
-    protected void showHistoryScoop(){
-    	yearLayout.setVisibility(View.VISIBLE);
-		AnimationSet animateSet = new AnimationSet(true);
-		Animation slideUp = new TranslateAnimation(
-                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                0.0f, Animation.RELATIVE_TO_SELF, -1.0f,
-                Animation.RELATIVE_TO_SELF, 0.0f);
-		slideUp.setDuration(600);
-		slideUp.setAnimationListener(new AnimationListener(){
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-				
-			}
-
-			@Override
-			public void onAnimationStart(Animation animation) {
-				
-			}
-		});
-		animateSet.addAnimation(slideUp);
-		LayoutAnimationController controller = new LayoutAnimationController(animateSet, 0.25f);
-		
-		this.yearLayout.startAnimation(slideUp);
-    }
 	protected void showCurrentLocation(){
     	Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     	if (location == null){
@@ -357,7 +291,6 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     		getList(location.getLatitude(),location.getLongitude());
     		if(drawOnMap()!= true)
     			Toast.makeText(getApplication(),"無符合年代以上之景點",Toast.LENGTH_LONG).show();
-    		yearSeekBar.setEnabled(true);
     		
     		mv.invalidate();
     		
@@ -399,14 +332,15 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			if(oldpoiOverlay != null){
 				mv.getOverlays().remove(oldpoiOverlay);
 			}
+			
 			for(Map<String, String> map : soilist){	//check every point are in the year
 				GeoPoint gp;
-				if(Integer.parseInt(map.get("POI_YEAR"))<=this.yearToSearch){
-					gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
-					OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
-					poiOverlay.addOverlay(poi);
-				}
+				gp = new GeoPoint((int)(Double.parseDouble(map.get("latitude"))*1E6),(int)(Double.parseDouble(map.get("longitude"))*1E6));
+				OverlayItem poi = new OverlayItem(gp, map.get("POI_title"),map.get("POI_description"));
+				poiOverlay.addOverlay(poi);
+				
 			}
+			
 			if(poiOverlay.size() != 0){
 				mv.getOverlays().add(poiOverlay);
 				oldpoiOverlay = poiOverlay;

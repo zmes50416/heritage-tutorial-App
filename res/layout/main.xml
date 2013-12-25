@@ -2,13 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-	
+    android:orientation="vertical"
+    >
+	
+
 <edu.ncue.im.MyMapView
     android:id="@+id/mapview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below="@+id/yearLayout"
     android:apiKey="@string/googleMap_API"
     android:clickable="true" >
 
@@ -44,7 +45,8 @@
         	android:layout_height="wrap_content"
     	/>
     	
-	</TableLayout>	<ScrollView
+	</TableLayout>
+	<ScrollView
 	    android:id="@id/poiDrawerContent"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
@@ -59,32 +61,4 @@
 
 	</ScrollView>
 </SlidingDrawer>
-
-<RelativeLayout
-    android:id="@+id/yearLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentTop="true" >
-
-<SeekBar
-    android:id="@+id/year_seekBar"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:layout_toLeftOf="@+id/year_TextView"
-    android:max="100"
-    android:progress="0" />
-
-<TextView
-    android:id="@+id/year_TextView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_above="@id/mapview"
-    android:layout_alignBottom="@+id/year_seekBar"
-    android:layout_alignParentRight="true"
-    android:layout_alignTop="@+id/year_seekBar"
-    android:text="@string/historytimeline"
-    />
-</RelativeLayout>
 </RelativeLayout>
