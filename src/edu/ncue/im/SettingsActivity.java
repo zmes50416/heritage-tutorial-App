@@ -1,45 +1,26 @@
 package edu.ncue.im;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.json.JSONObject;
-
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.content.*;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.Facebook.DialogListener;
 import com.facebook.android.FacebookError;
+import android.widget.*;
 
 import edu.ncue.test.jls.R;
 
 
-public class SettingsActivity extends Activity {
-	
+public class SettingsActivity extends Activity {	
 	public static final String APP_ID = "273315202770124";
 	String[] permissions = { "publish_stream", "offline_access"};
 	
@@ -48,6 +29,7 @@ public class SettingsActivity extends Activity {
 	TextView userName;
 	ImageView userPicView;
 	//public static Facebook facebook = new Facebook(APP_ID);
+
 	private SharedPreferences mPrefs;
 	
 	@Override
@@ -89,7 +71,6 @@ public class SettingsActivity extends Activity {
 		 spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
 		 public void onItemSelected(AdapterView adapterView, View view, int position, long id){
 			 SharedPreferences.Editor editor = mPrefs.edit();
-			 
 			 switch(adapterView.getSelectedItemPosition()){				
 			 				case 0:
 			 					editor.putInt("distanceSetting", 0);
@@ -178,8 +159,7 @@ public class SettingsActivity extends Activity {
 			}
 			
 		});
-		
-		 
+				 
 	}
 	
 	private void login(){
