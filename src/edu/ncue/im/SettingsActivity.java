@@ -1,33 +1,17 @@
 package edu.ncue.im;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.json.JSONObject;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.*;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.*;
 
 import edu.ncue.test.jls.R;
 
 public class SettingsActivity extends Activity {
 	
-	private String name;
-	private String imageURL;
-	TextView userName;
-	ImageView userPicView;
 	private SharedPreferences mPrefs;
 	
 	@Override
@@ -65,7 +49,6 @@ public class SettingsActivity extends Activity {
 		 spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
 		 public void onItemSelected(AdapterView adapterView, View view, int position, long id){
 			 SharedPreferences.Editor editor = mPrefs.edit();
-			 
 			 switch(adapterView.getSelectedItemPosition()){				
 			 				case 0:
 			 					editor.putInt("distanceSetting", 0);
@@ -79,24 +62,10 @@ public class SettingsActivity extends Activity {
 			 				}
 			 editor.commit();
 		 }
-
 		 @Override
 		 public void onNothingSelected(AdapterView<?> arg0) {}
 		 });
-		 
-		 userName = (TextView)findViewById(R.id.userNameTextView);
-		 Button logoutButton = (Button)findViewById(R.id.facebookLogOutButton);
-		 userPicView = (ImageView)findViewById(R.id.userPictureImageView);
-		 		logoutButton.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				//login();
-				
-			}
-			
-		});
-		
+		 		
 		 
 	}
 	

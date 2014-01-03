@@ -55,13 +55,6 @@ public class POIItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 			Paint paintCircle = new Paint();
 			paintCircle.setColor(Color.RED);
 			canvas.drawCircle(point.x, point.y, 5, paintCircle);
-
-			/*Paint paintText = new Paint();
-			paintText.setColor(Color.BLACK);
-			paintText.setTextSize(15);
-			canvas.drawText(title, point.x, point.y - 25, paintText);
-			*/ 
-
 		}
 
 		super.draw(canvas, mapView, shadow);
@@ -96,18 +89,9 @@ public class POIItemizedOverlay extends ItemizedOverlay<OverlayItem> {
                   
                 mContext.popView.setVisibility(View.GONE);  
             }  
-              
-              
+            
         });  
         
-		/*
-		Bundle bundle = new Bundle();
-		bundle.putSerializable("POITitle", item.getTitle());
-		bundle.putSerializable("POISnippet", item.getSnippet());
-		Intent intent = new Intent();
-		intent.setAction(MainMapActivity.POI_TAPPED_ACTION);
-		mContext.sendBroadcast(intent.putExtras(bundle));
-		*/
 		return true;
 	}
 	

@@ -74,7 +74,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 	protected MyLocationOverlay myLocationOverlay;
 	protected SlidingDrawer poiDrawer;
 	protected POILoadTask poiLoadTask;
-	protected ArrayList<Map<String, String>>soilist;
+	protected ArrayList<Map<String, String>> soilist;
 	protected View popView;
 	
 	@Override
@@ -92,7 +92,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 			return true;
 		}
 		else if(id == R.id.listView){
-			this.displayListView();
+			this.enterListView();
 			return true;
 		}
 		/*
@@ -102,11 +102,11 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 		}
 		*/
 		else if(id == R.id.setting){
-			this.login();
+			this.enterSetting();
 			return true;
 		}
 		else if(id == R.id.nfc_passport){
-			this.nfc();
+			this.enterNfc();
 			return true;
 		}
 		else{
@@ -160,7 +160,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 						myOverlay.addOverlay(overlayItem);
 						getList(longpressLocation.getLatitudeE6() / 1E6, longpressLocation.getLongitudeE6() / 1E6);
 						if(drawOnMap()!= true)
-			    			Toast.makeText(getApplication(),"無符合年代以上之景點",Toast.LENGTH_SHORT).show();
+			    			Toast.makeText(getApplication(),"搜尋條件下無景點",Toast.LENGTH_SHORT).show();
 			    		mv.getOverlays().add(myOverlay);
 			    		mv.invalidate();
 					}
@@ -290,7 +290,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     		
     		getList(location.getLatitude(),location.getLongitude());
     		if(drawOnMap()!= true)
-    			Toast.makeText(getApplication(),"無符合年代以上之景點",Toast.LENGTH_LONG).show();
+    			Toast.makeText(getApplication(),"搜尋條件下無景點",Toast.LENGTH_LONG).show();
     		
     		mv.invalidate();
     		
@@ -302,7 +302,7 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
     	
     }
 	
-	protected void displayListView(){
+	protected void enterListView(){
 		Intent intent = new Intent();
 		
 		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -355,13 +355,12 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 		
 	}
 	
-	//Facebook Login
-	protected void login(){
+	protected void enterSetting(){
 		startActivity(new Intent().setClass(getApplicationContext(), SettingsActivity.class));
 	}
 	
 	//NFCPassPort
-	protected void nfc(){
+	protected void enterNfc(){
 		startActivity(new Intent().setClass(getApplicationContext(), NfcPassportActivity.class));
 	}
 	Location oldLocation;
@@ -536,7 +535,9 @@ public class MainMapActivity extends MapActivity{//繼承mapActivity
 						String picsSumURL = new String();
 						for (int j=0;j<picJson.getInt("count");j++){
 							JSONObject jsonPic = pics.getJSONObject(j);
-							picsSumURL += jsonPic.getString("url")+";";
+							String singleURL = jsonPic.getString("url");
+							//jsonObject will retrieve one more h cause data error. ex hhttp://...
+							picsSumURL += singleURL.substring(1,singleURL.length())+";";
 							
 							}
 						map.put("PICsURL", picsSumURL);

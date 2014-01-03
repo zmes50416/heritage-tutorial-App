@@ -10,5 +10,6 @@
 	<string name="pushInButtom">新增戳章</string>
 	<string name="get_started">To get started, log in using Facebook</string>
 	<string name="app_fb_id">273315202770124</string>
+	<string name="searchDistance">搜尋距離</string>
 	
 </resources>
