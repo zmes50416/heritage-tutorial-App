@@ -75,10 +75,10 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	protected MyLocationOverlay myLocationOverlay;
 	protected SlidingDrawer poiDrawer;
 	protected POILoadTask poiLoadTask;
-	protected ArrayList<Map<String, String>>soilist;
 	protected int yearToSearch; 
 	protected TextView yearTextView;
 	protected RelativeLayout yearLayout;
+	protected POIArrayList soilist;
 	protected View popView;
 	
 	@Override
@@ -152,7 +152,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
         poiDrawer.setVisibility(View.GONE);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        soilist = new ArrayList<Map<String, String>>();
+        soilist = new POIArrayList();
         mv = (MyMapView) findViewById(R.id.mapview);
         
         mv.setBuiltInZoomControls(false);	//disable the zoom button
@@ -431,7 +431,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 	}
 	Location oldLocation;
 	
-	public ArrayList<Map<String, String>> getList(double latitude, double longitude){
+	public POIArrayList getList(double latitude, double longitude){
 		Location currentLocation = new Location("currentLocation");
 		
 		currentLocation.setLatitude(latitude);
@@ -516,11 +516,11 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
      * ³Ì«á³B²z¦¨¤@¥÷ArrayList
      */
 	//Network must need AsyncTask to run on another thread
-	private class POILoadTask extends AsyncTask<Double, Void, ArrayList<Map<String, String>>>{
+	private class POILoadTask extends AsyncTask<Double, Void,POIArrayList>{
 		ProgressDialog p;
 		String formatted_result;
 		String request_URL;
-		private ArrayList<Map<String, String>> soilist;
+		private POIArrayList soilist;
 		
 		protected JSONObject jsonObjcet;
 		protected JSONArray jsonList;
@@ -532,10 +532,10 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 		}
 		
 		@Override
-		protected ArrayList<Map<String, String>> doInBackground(Double... params) {
+		protected POIArrayList doInBackground(Double... params) {
 			
 			request_URL ="http://deh.csie.ncku.edu.tw/dehencode/json/nearbyPOIs?lat="+params[0]+"&lng="+params[1]+"&dist="+MainMapActivity.DISTANCE_TO_SEARCH;
-			soilist = new ArrayList<Map<String,String>>();
+			soilist = new POIArrayList();
 			try{
 				formatted_result = this.sentHttpRequest(request_URL);
 				soilist = parseJson(formatted_result);
@@ -567,14 +567,14 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 			
 		}
 		@Override
-		protected void onPostExecute(ArrayList<Map<String, String>> result){
+		protected void onPostExecute(POIArrayList result){
 			super.onPostExecute(result);
 			Log.d("progress", "task onPostExecute");
 			p.dismiss();
 		}
 		
-		private ArrayList<Map<String, String>> parseJson(String str)throws JSONException{
-			ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		private POIArrayList parseJson(String str)throws JSONException{
+			POIArrayList list = new POIArrayList();
 			if(formatted_result!=null){
 				//formatted_result = purge(formatted_result);
 				jsonObjcet = new JSONObject(str);
@@ -616,7 +616,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 			        Log.d("json","latitude:"+temp.getString("latitude"));
 			        Log.d("json","distance:"+temp.getString("distance") );
 			        Log.d("json",map.get("pic_Count"));
-			        Log.d("json","year:"+temp.getString("year"));
+			        Log.d("json","year:"+temp.getString("year"));				
 			        
 				}
 					
@@ -655,7 +655,7 @@ public class MainMapActivity extends MapActivity{//Ä~©ÓmapActivity
 			}
 		}
 		
-		public ArrayList<Map<String, String>> getsoilist(){
+		public POIArrayList getsoilist(){
 			return soilist;
 		}
 		
